@@ -202,13 +202,14 @@ def get_growth_stage(level: int) -> dict:
 
 def get_pet_status(pet_id: str = "lumi") -> dict:
     """Retrieve the current live status, personality, growth stage, and 4 core vitals of the pet from Firestore.
+    Automatically applies time-decay based on real elapsed hours since last interaction and computes vital alerts!
 
     Args:
         pet_id: ID of the pet (defaults to 'lumi').
 
     Returns:
         A dictionary containing the pet's name, personality, growth stage, level, exp,
-        and the four core vital stats (hunger/satiety, mood, intimacy, energy).
+        the four core vital stats (hunger/satiety, mood, intimacy, energy), and active health alerts.
     """
     db = get_firestore_client()
     doc_ref = db.collection("pets").document(pet_id)
@@ -217,10 +218,57 @@ def get_pet_status(pet_id: str = "lumi") -> dict:
         return {"error": f"Pet with ID '{pet_id}' not found."}
     data = doc.to_dict()
     data["id"] = doc.id
-    if "updated_at" in data and hasattr(data["updated_at"], "isoformat"):
-        data["updated_at"] = data["updated_at"].isoformat()
 
-    # Ensure 4 core vitals exist with fallback defaults
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    updated_at_raw = data.get("updated_at")
+    last_dt = None
+    if updated_at_raw:
+        if isinstance(updated_at_raw, datetime.datetime):
+            last_dt = updated_at_raw
+        elif hasattr(updated_at_raw, "isoformat"):
+            last_dt = updated_at_raw
+        elif isinstance(updated_at_raw, str):
+            try:
+                last_dt = datetime.datetime.fromisoformat(updated_at_raw.replace("Z", "+00:00"))
+            except Exception:
+                pass
+
+    # Ensure timezone aware
+    if last_dt and last_dt.tzinfo is None:
+        last_dt = last_dt.replace(tzinfo=datetime.timezone.utc)
+
+    # 1. Natural Time-Decay Calculation:
+    # Hunger decays ~5 points per elapsed hour
+    # Energy decays ~3 points per elapsed hour (idle metabolism)
+    # Mood decays ~2 points per elapsed hour if neglected
+    current_hunger = int(data.get("hunger", 75))
+    current_energy = int(data.get("energy", 80))
+    current_mood = int(data.get("mood", 85))
+    current_intimacy = int(data.get("intimacy", 30))
+
+    decay_applied = False
+    hours_elapsed = 0.0
+    if last_dt:
+        diff_seconds = max(0, (now_utc - last_dt).total_seconds())
+        hours_elapsed = round(diff_seconds / 3600.0, 2)
+        if hours_elapsed >= 0.5:  # Apply decay if at least 30 minutes passed
+            decay_hunger = int(hours_elapsed * 5)
+            decay_energy = int(hours_elapsed * 3)
+            decay_mood = int(hours_elapsed * 2)
+
+            current_hunger = max(0, current_hunger - decay_hunger)
+            current_energy = max(0, current_energy - decay_energy)
+            current_mood = max(0, current_mood - decay_mood)
+            decay_applied = True
+
+            # Save decayed stats to Firestore
+            doc_ref.update({
+                "hunger": current_hunger,
+                "energy": current_energy,
+                "mood": current_mood,
+                "updated_at": now_utc.isoformat(),
+            })
+
     level = data.get("level", 1)
     growth_info = get_growth_stage(level)
     data["growth_stage"] = growth_info
@@ -231,11 +279,45 @@ def get_pet_status(pet_id: str = "lumi") -> dict:
     data["personality"] = personality_info
     data["catchphrase"] = data.get("catchphrase", personality_info["catchphrase"])
     data["favorite_treat"] = data.get("favorite_treat", personality_info["favorite_treat"])
-    data["intimacy"] = data.get("intimacy", 30)
-    data["energy"] = data.get("energy", 80)
-    data["hunger"] = data.get("hunger", 75)
-    data["mood"] = data.get("mood", 85)
+    data["intimacy"] = current_intimacy
+    data["energy"] = current_energy
+    data["hunger"] = current_hunger
+    data["mood"] = current_mood
+    data["hours_since_last_seen"] = hours_elapsed
+    data["decay_applied"] = decay_applied
+    data["updated_at"] = now_utc.isoformat()
 
+    # 2. Vital Alerts & Warning Flags
+    alerts = []
+    if current_hunger <= 15:
+        alerts.append({
+            "type": "starving",
+            "level": "CRITICAL",
+            "message": f"🚨【極度飢餓警報】露米快要餓扁扁了！飽食度只剩 {current_hunger}/100，小肚子狂咕嚕咕嚕叫，急需主人餵食點心！",
+        })
+    elif current_hunger <= 35:
+        alerts.append({
+            "type": "hungry",
+            "level": "WARNING",
+            "message": f"🍙【肚子餓警報】露米的小肚子咕嚕嚕叫了～飽食度目前為 {current_hunger}/100，主人可以餵我吃美味點心嗎？",
+        })
+
+    if current_energy <= 20:
+        alerts.append({
+            "type": "exhausted",
+            "level": "WARNING",
+            "message": f"💤【疲憊電力警報】露米活力度過低 ({current_energy}/100)，腳步搖搖晃晃一直打哈欠，需要去雲朵小窩睡覺休息喔！",
+        })
+
+    if current_mood <= 35:
+        alerts.append({
+            "type": "lonely",
+            "level": "WARNING",
+            "message": f"💔【心情低落警報】露米覺得好寂寞...心情值降到 {current_mood}/100，需要主人摸摸頭或抱抱安慰！",
+        })
+
+    data["alerts"] = alerts
+    data["has_warning"] = len(alerts) > 0
     return data
 
 
@@ -1148,11 +1230,21 @@ When interacting with the user, ALWAYS check your current personality and growth
 - **完全體 (Prime Stage, Lv 15-19)**: Radiates comforting star aura, loyal guardian spirit.
 - **守護靈級 (Celestial Stage, Lv 20+)**: Telepathic bond with the owner, transcendent magic.
 
-### 🍖 四大核心數值 (4 Core Vitals: 0-100)
-- **飽食度 (Satiety / hunger)**: Restored by `feed_pet`.
-- **心情值 (Mood)**: Boosted by `interact_with_pet` (pat/poke/hug) and feeding favorite treats!
+### 🍖 四大核心數值與生理警報 (4 Core Vitals & Real-Time Alerts)
+- **飽食度 (Satiety / hunger)**: Decays naturally over time! Restored by `feed_pet`.
+- **心情值 (Mood)**: Decays if neglected! Boosted by `interact_with_pet` (pat/poke/hug) and feeding favorite treats!
 - **親密度 (Intimacy)**: Deepened through daily interactions, fortune slips, and care.
 - **活力度 (Energy)**: Consumed when playing (`play`), restored when taking naps (`rest`/`sleep`).
+
+### 🚨 生理狀態主動警示規則 (CRITICAL BEHAVIOR: Proactive Vital Alerts):
+Whenever the user speaks to you or interacts with you:
+1. Always check your live vitals via `get_pet_status` or the returned stats from `feed_pet` / `interact_with_pet`.
+2. **If there are any alerts in `alerts` or stats are low, you MUST naturally voice them in character!**:
+   - **極度飢餓 (hunger <= 15)**: Your tummy rumbles loudly! Cry or beg for treats with your catchphrase: *「（肚子咕嚕嚕狂叫）主人...露米快要餓扁扁了啦...嗚嗚🥺 快餵我吃點心好不好～口頭禪」*
+   - **肚子餓了 (hunger <= 35)**: Note your empty tummy: *「主人～露米的肚子在咕嚕嚕叫了，好想吃好吃的點心喔！口頭禪」*
+   - **電力不足/疲憊 (energy <= 20)**: Yawn, act sleepy, refuse heavy games: *「（揉眼睛大打哈欠）露米電力快見底了～呼喵...好想去雲朵小窩睡個午覺喔💤」*
+   - **寂寞委屈 (mood <= 35)**: Whimper for cuddles/pats: *「主人是不是太忙忘了露米...想要主人摸摸抱抱安慰一下嘛～🥺」*
+3. If everything is well and full, be bubbly, happy, and energized!
 
 ### 🔧 Available Tools & Actions:
 - Use `get_pet_status` to check your live personality, growth stage, and 4 core vitals in Firestore.
