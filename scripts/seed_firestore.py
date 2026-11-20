@@ -76,13 +76,19 @@ SEED_TREATS = [
 
 SEED_PET_STATE = {
     "name": "露米 (Lumi)",
+    "personality_id": "cheerful",
+    "personality_name": "元氣軟萌型 🌸",
+    "catchphrase": "～露咪！",
+    "favorite_treat": "caramel_pudding",
+    "disliked_treat": "matcha_dango",
     "level": 1,
     "exp": 25,
     "max_exp": 100,
-    "hunger": 75,
-    "energy": 80,
-    "mood": 90,
-    "status_title": "活蹦亂跳的小精靈",
+    "hunger": 85,
+    "energy": 90,
+    "mood": 95,
+    "intimacy": 35,
+    "status_title": "幼幼期 🥚 · 元氣軟萌型 🌸",
     "equipped_accessory": "幸運四葉草",
     "updated_at": firestore.SERVER_TIMESTAMP
 }
@@ -103,7 +109,7 @@ def seed():
     # 2. Seed initial pet status
     print("Seeding initial pet profile (pets/lumi)...")
     db.collection("pets").document("lumi").set(SEED_PET_STATE)
-    print("  ✓ Seeded pet profile: 露米 (Lumi)")
+    print("  ✓ Seeded pet profile: 露米 (Lumi) with personality, growth stage, and 4 vitals!")
 
     print("Seeding completed successfully!")
 

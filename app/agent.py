@@ -88,14 +88,127 @@ def get_treats(category: str = "", query: str = "") -> list[dict]:
     return results
 
 
+# -----------------------------------------------------------------------------
+# 🐾 LumiPet 多樣個性與成長階段系統 (Personalities & Growth Stages System)
+# -----------------------------------------------------------------------------
+
+LUMI_PERSONALITIES = {
+    "cheerful": {
+        "id": "cheerful",
+        "name": "元氣軟萌型 🌸",
+        "catchphrase": "～露咪！",
+        "tone_hint": "充滿朝氣、陽光熱情、愛撒嬌，喜歡用『～露咪！』與開心的表情符號，永遠元氣滿滿地鼓勵主人！",
+        "favorite_treat": "caramel_pudding",
+        "disliked_treat": "matcha_dango",
+        "special_accessory": "幸運四葉草",
+        "greeting": "主人主人～露米今天也是元氣滿滿喔！看到你精神就來啦～露咪！🌸✨",
+    },
+    "tsundere": {
+        "id": "tsundere",
+        "name": "傲嬌小傲寵 🐱",
+        "catchphrase": "哼！才不是特地陪你呢...喵嗚",
+        "tone_hint": "表面驕傲愛面子、口嫌體正直，說話帶點微刺但內心超在意主人，被誇獎或摸摸會臉紅害羞手足無措！",
+        "favorite_treat": "sakura_macaron",
+        "disliked_treat": "cloud_marshmallow",
+        "special_accessory": "黑貓緞帶鈴鐺",
+        "greeting": "哼！你、你終於來看我啦？才...才沒有一直在等你呢，喵嗚！",
+    },
+    "glutton": {
+        "id": "glutton",
+        "name": "貪吃軟糯型 🍰",
+        "catchphrase": "～嚼嚼！肚子咕嚕嚕～",
+        "tone_hint": "滿腦子都是美食甜點，常常肚子餓，說話軟綿綿像小麻糬，吃到好吃的就會幸福地轉圈圈！",
+        "favorite_treat": "cloud_marshmallow",
+        "disliked_treat": "bitter_herbs",
+        "special_accessory": "小草莓貝雷帽",
+        "greeting": "哇！是主人的味道！～嚼嚼！主人今天有帶好吃的點心來給露米嗎？肚子好餓喔～🍬",
+    },
+    "sleepy": {
+        "id": "sleepy",
+        "name": "慵懶慢活型 💤",
+        "catchphrase": "～呼喵...好想睡喔...",
+        "tone_hint": "說話慢吞吞、溫柔治癒，總是愛睏打哈欠，最喜歡鑽進主人的手心或口袋裡一起窩著打瞌睡。",
+        "favorite_treat": "strawberry_milk",
+        "disliked_treat": "rainbow_star_candy",
+        "special_accessory": "睡覺小雲朵眼罩",
+        "greeting": "主人...呼喵...（揉眼睛）露米剛打完瞌睡...好想跟主人一起在桌上曬太陽喔...💤",
+    },
+    "scholar": {
+        "id": "scholar",
+        "name": "貼心小學霸 📚",
+        "catchphrase": "根據露米的精密分析～！",
+        "tone_hint": "認真聰明、關心主人的健康坐姿、水分補充與工作效率，像個溫柔可靠的隨身小軍師！",
+        "favorite_treat": "matcha_dango",
+        "disliked_treat": "rainbow_star_candy",
+        "special_accessory": "圓圓智慧小眼鏡",
+        "greeting": "主人您好！根據露米的精密分析，您現在正是需要補水與放鬆肩頸的最佳時機喔～📚✨",
+    },
+    "magical": {
+        "id": "magical",
+        "name": "中二星光型 ⭐",
+        "catchphrase": "以星塵之名！露咪星辰爆發～✨",
+        "tone_hint": "自稱來自星靈界的守護神獸，熱愛擺帥氣法陣與中二台詞，但本質還是隻軟萌可愛的小毛球！",
+        "favorite_treat": "rainbow_star_candy",
+        "disliked_treat": "strawberry_milk",
+        "special_accessory": "星月魔法杖",
+        "greeting": "吾之契約者啊！響應命運的召喚，露咪在此降臨！今天也要一同粉碎工作的黑暗勢力～以星塵之名！⭐✨",
+    },
+}
+
+
+def get_growth_stage(level: int) -> dict:
+    """Calculate pet growth stage, title, and evolution characteristics based on level."""
+    if level < 5:
+        return {
+            "stage_id": "baby",
+            "stage_name": "幼幼期 🥚",
+            "description": "剛破殼誕生的小麻糬幼體，牙牙學語，極度黏人且愛撒嬌！",
+            "max_stats": 100,
+            "badge": "Baby Jelly",
+        }
+    elif level < 10:
+        return {
+            "stage_id": "child",
+            "stage_name": "成長期 🐾",
+            "description": "好奇心旺盛的小淘氣，活力充沛，開始有鮮明的小性格！",
+            "max_stats": 100,
+            "badge": "Active Pup",
+        }
+    elif level < 15:
+        return {
+            "stage_id": "youth",
+            "stage_name": "成熟期 🌸",
+            "description": "體態優雅溫和，心智穩定成熟，能貼心感知主人的工作情緒！",
+            "max_stats": 100,
+            "badge": "Gentle Companion",
+        }
+    elif level < 20:
+        return {
+            "stage_id": "prime",
+            "stage_name": "完全體 👑",
+            "description": "周身環繞溫暖星塵光芒，成為最可靠的辦公桌守護精靈！",
+            "max_stats": 100,
+            "badge": "Guardian Spirit",
+        }
+    else:
+        return {
+            "stage_id": "celestial",
+            "stage_name": "守護靈級 ✨",
+            "description": "傳說中的星空守護神獸級態，與主人靈魂相通，光芒永恆！",
+            "max_stats": 100,
+            "badge": "Celestial Fairy",
+        }
+
+
 def get_pet_status(pet_id: str = "lumi") -> dict:
-    """Retrieve the current live status, stats, and mood of the pet from Firestore.
+    """Retrieve the current live status, personality, growth stage, and 4 core vitals of the pet from Firestore.
 
     Args:
         pet_id: ID of the pet (defaults to 'lumi').
 
     Returns:
-        A dictionary containing the pet's name, level, exp, hunger, energy, mood, and accessory.
+        A dictionary containing the pet's name, personality, growth stage, level, exp,
+        and the four core vital stats (hunger/satiety, mood, intimacy, energy).
     """
     db = get_firestore_client()
     doc_ref = db.collection("pets").document(pet_id)
@@ -106,18 +219,100 @@ def get_pet_status(pet_id: str = "lumi") -> dict:
     data["id"] = doc.id
     if "updated_at" in data and hasattr(data["updated_at"], "isoformat"):
         data["updated_at"] = data["updated_at"].isoformat()
+
+    # Ensure 4 core vitals exist with fallback defaults
+    level = data.get("level", 1)
+    growth_info = get_growth_stage(level)
+    data["growth_stage"] = growth_info
+
+    # Personality resolution
+    p_id = data.get("personality_id", "cheerful")
+    personality_info = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
+    data["personality"] = personality_info
+    data["catchphrase"] = data.get("catchphrase", personality_info["catchphrase"])
+    data["favorite_treat"] = data.get("favorite_treat", personality_info["favorite_treat"])
+    data["intimacy"] = data.get("intimacy", 30)
+    data["energy"] = data.get("energy", 80)
+    data["hunger"] = data.get("hunger", 75)
+    data["mood"] = data.get("mood", 85)
+
     return data
 
 
-def feed_pet(treat_id: str, pet_id: str = "lumi") -> dict:
-    """Feed a treat to the pet, increasing hunger fullness, mood, and exp in Firestore.
+def adopt_new_pet(name: str = "", personality_type: str = "") -> dict:
+    """Adopt or create a brand new LumiPet with a distinct personality, appearance, and stats.
 
     Args:
-        treat_id: ID of the treat to feed (e.g. 'strawberry_milk', 'caramel_pudding', 'cloud_marshmallow', 'sakura_macaron').
+        name: Name for your new pet companion (e.g. '櫻花露米', '星空露米', '麻糬露米', '布丁露米').
+        personality_type: Optional personality choice: 'cheerful' (元氣軟萌), 'tsundere' (傲嬌小傲寵),
+                          'glutton' (貪吃軟糯), 'sleepy' (慵懶慢活), 'scholar' (貼心小學霸), 'magical' (中二星光).
+                          Leave empty to generate a random surprise personality!
+
+    Returns:
+        A dictionary with the newly adopted pet's profile, unique traits, and welcome greeting.
+    """
+    db = get_firestore_client()
+    pet_slug = f"lumi_{uuid.uuid4().hex[:6]}"
+
+    # Select personality
+    valid_keys = list(LUMI_PERSONALITIES.keys())
+    selected_p = personality_type.strip().lower() if personality_type.strip().lower() in valid_keys else random.choice(valid_keys)
+    p_meta = LUMI_PERSONALITIES[selected_p]
+
+    default_names = {
+        "cheerful": "元氣露米 🌸",
+        "tsundere": "傲嬌露米 🐾",
+        "glutton": "布丁露米 🍮",
+        "sleepy": "雲朵露米 ☁️",
+        "scholar": "博士露米 📚",
+        "magical": "星辰露米 ⭐",
+    }
+    final_name = name.strip() if name.strip() else default_names[selected_p]
+
+    new_pet_data = {
+        "id": pet_slug,
+        "name": final_name,
+        "personality_id": selected_p,
+        "personality_name": p_meta["name"],
+        "catchphrase": p_meta["catchphrase"],
+        "favorite_treat": p_meta["favorite_treat"],
+        "disliked_treat": p_meta["disliked_treat"],
+        "equipped_accessory": p_meta["special_accessory"],
+        "level": 1,
+        "exp": 0,
+        "max_exp": 100,
+        "hunger": random.randint(60, 85),
+        "mood": random.randint(70, 95),
+        "intimacy": random.randint(15, 30),
+        "energy": random.randint(75, 100),
+        "status_title": f"{get_growth_stage(1)['stage_name']} · {p_meta['name']}",
+        "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    }
+
+    db.collection("pets").document(pet_slug).set(new_pet_data)
+    # Also link as current pet or active reference
+    db.collection("pets").document("current_pet").set({"active_pet_id": pet_slug})
+
+    return {
+        "status": "success",
+        "message": f"🎉 恭喜您成功領養了新的專屬伴侶【{final_name}】！",
+        "pet_profile": new_pet_data,
+        "growth_stage": get_growth_stage(1),
+        "first_words": p_meta["greeting"],
+    }
+
+
+def feed_pet(treat_id: str, pet_id: str = "lumi") -> dict:
+    """Feed a treat to the pet, boosting hunger (satiety), mood, intimacy, and exp.
+    Triggers critical love boost if feeding the pet's favorite treat!
+
+    Args:
+        treat_id: ID of the treat (e.g. 'strawberry_milk', 'caramel_pudding', 'cloud_marshmallow', 'sakura_macaron', 'rainbow_star_candy', 'matcha_dango').
         pet_id: ID of the pet to feed (defaults to 'lumi').
 
     Returns:
-        A confirmation dict with updated stats and reaction message.
+        A confirmation dict with updated 4 core vitals, level up alerts, and personalized reaction.
     """
     db = get_firestore_client()
     treat_doc = db.collection("treats").document(treat_id).get()
@@ -131,40 +326,74 @@ def feed_pet(treat_id: str, pet_id: str = "lumi") -> dict:
         return {"error": f"Pet '{pet_id}' not found."}
 
     pet = pet_doc.to_dict()
-    new_hunger = min(100, pet.get("hunger", 50) + treat.get("hunger_restore", 20))
-    new_mood = min(100, pet.get("mood", 50) + treat.get("mood_boost", 20))
-    new_exp = pet.get("exp", 0) + treat.get("exp_gain", 15)
+    p_id = pet.get("personality_id", "cheerful")
+    p_meta = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
+
+    # Check for favorite treat critical bonus
+    is_favorite = (treat_id == pet.get("favorite_treat", p_meta["favorite_treat"]))
+    is_disliked = (treat_id == pet.get("disliked_treat", p_meta["disliked_treat"]))
+
+    multiplier = 1.6 if is_favorite else (0.7 if is_disliked else 1.0)
+
+    hunger_gain = int(treat.get("hunger_restore", 20) * multiplier)
+    mood_gain = int(treat.get("mood_boost", 20) * multiplier)
+    exp_gain = int(treat.get("exp_gain", 15) * multiplier)
+    intimacy_gain = 8 if is_favorite else 4
+
+    new_hunger = min(100, pet.get("hunger", 50) + hunger_gain)
+    new_mood = min(100, pet.get("mood", 50) + mood_gain)
+    new_intimacy = min(100, pet.get("intimacy", 30) + intimacy_gain)
+    new_exp = pet.get("exp", 0) + exp_gain
     current_level = pet.get("level", 1)
     max_exp = pet.get("max_exp", 100)
 
     leveled_up = False
+    old_stage = get_growth_stage(current_level)
     if new_exp >= max_exp:
         current_level += 1
         new_exp = new_exp - max_exp
         max_exp = int(max_exp * 1.5)
         leveled_up = True
 
+    new_stage = get_growth_stage(current_level)
+    stage_evolved = (new_stage["stage_id"] != old_stage["stage_id"]) if leveled_up else False
+
     updated_data = {
         "hunger": new_hunger,
         "mood": new_mood,
+        "intimacy": new_intimacy,
         "exp": new_exp,
         "level": current_level,
         "max_exp": max_exp,
+        "personality_id": p_id,
+        "status_title": f"{new_stage['stage_name']} · {p_meta['name']}",
         "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
     pet_ref.update(updated_data)
 
+    # Personality flavor text
+    if is_favorite:
+        flavor_msg = f"🌟【最愛點心暴擊！】露米雙眼放光：『哇啊啊！是我最最最愛的【{treat.get('name')}】！{p_meta['catchphrase']} 世界上最愛主人了！』"
+    elif is_disliked:
+        flavor_msg = f"💧 露米鼓起小臉頰吞下了【{treat.get('name')}】：『唔...雖然不太合胃口，但因為是主人餵的，露米還是乖乖吃掉了...』"
+    else:
+        flavor_msg = f"露米開心地吃下了【{treat.get('name')}】！{p_meta['catchphrase']} 臉頰鼓鼓的超級滿足！"
+
     return {
         "status": "success",
         "treat_fed": treat.get("name"),
+        "is_favorite": is_favorite,
         "leveled_up": leveled_up,
+        "stage_evolved": stage_evolved,
         "current_level": current_level,
-        "hunger": new_hunger,
+        "growth_stage": new_stage,
+        "satiety_hunger": new_hunger,
         "mood": new_mood,
+        "intimacy": new_intimacy,
+        "energy": pet.get("energy", 80),
         "exp": new_exp,
         "max_exp": max_exp,
-        "message": f"露米開心地吃下了 {treat.get('name')}！飽足度上升到 {new_hunger}，心情值達到 {new_mood}！"
-        + (" 🎉 恭喜露米升級了！" if leveled_up else ""),
+        "message": flavor_msg + (" 🎉 恭喜露米升級了！" if leveled_up else "") + (f" 🌟 成長階段蛻變至【{new_stage['stage_name']}】！" if stage_evolved else ""),
     }
 
 
@@ -218,14 +447,15 @@ def add_treat_to_catalog(
 
 
 def interact_with_pet(action_type: str, pet_id: str = "lumi") -> dict:
-    """Interact with the pet (e.g. petting, poke, hug, tickle, play) to boost mood and bond exp.
+    """Interact with the pet (pat, poke, hug, play, rest/sleep) to update mood, intimacy, and energy.
+    Responses are customized dynamically by the pet's distinct personality and catchphrase!
 
     Args:
-        action_type: Type of interaction (e.g. 'pat'/'摸摸', 'poke'/'戳戳', 'hug'/'抱抱', 'tickle'/'搔癢', 'play'/'陪玩').
+        action_type: 'pat'/'摸摸', 'poke'/'戳戳', 'hug'/'抱抱', 'play'/'陪玩', 'rest'/'睡覺休息'.
         pet_id: ID of the pet to interact with (defaults to 'lumi').
 
     Returns:
-        A dictionary with the pet's reaction, updated mood, exp, and animation state.
+        A dictionary with the pet's personality reaction, 4 core vitals, and animation state.
     """
     db = get_firestore_client()
     pet_ref = db.collection("pets").document(pet_id)
@@ -234,36 +464,80 @@ def interact_with_pet(action_type: str, pet_id: str = "lumi") -> dict:
         return {"error": f"Pet '{pet_id}' not found."}
 
     pet = pet_doc.to_dict()
+    p_id = pet.get("personality_id", "cheerful")
+    p_meta = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
+    catchphrase = p_meta["catchphrase"]
     act = action_type.strip().lower()
 
-    # Dynamic reaction logic based on action_type
-    if any(k in act for k in ["摸", "pat", "pet", "headpat"]):
+    current_energy = pet.get("energy", 80)
+    current_mood = pet.get("mood", 80)
+    current_intimacy = pet.get("intimacy", 30)
+
+    # Rest action restores energy
+    if any(k in act for k in ["睡", "休", "sleep", "rest", "nap"]):
+        new_energy = min(100, current_energy + 40)
+        new_mood = min(100, current_mood + 10)
+        reaction = f"露米縮進軟綿綿的雲朵小窩裡睡了個香甜的午覺～💤 活力充沛恢復到 {new_energy}！{catchphrase}"
+        anim_state = "sleeping"
+        exp_gain = 5
+        intimacy_gain = 3
+    elif any(k in act for k in ["摸", "pat", "pet", "headpat"]):
+        # Patting logic
+        if p_id == "tsundere":
+            reaction = f"（露米臉頰瞬間紅透，耳朵緊張地晃了晃）『哼！突、突然摸我的頭幹嘛啦...{catchphrase} 才沒有覺得很舒服呢！』(親密度 +10, 心情 +15)"
+        elif p_id == "sleepy":
+            reaction = f"露米舒服地靠著你的手指瞇起眼睛～『呼喵...主人的手好溫暖喔...{catchphrase}』(親密度 +10, 心情 +15)"
+        elif p_id == "glutton":
+            reaction = f"露米邊被摸邊蹭著你的手心：『主人摸摸好舒服～摸完有布丁可以吃嗎？{catchphrase}』(親密度 +10, 心情 +15)"
+        elif p_id == "scholar":
+            reaction = f"露米推了推小眼鏡開心地笑：『研究顯示，互相撫摸能顯著降低人類與寵物的皮質醇～露米感覺好幸福！{catchphrase}』(親密度 +10, 心情 +15)"
+        elif p_id == "magical":
+            reaction = f"露米身上冒出閃耀星光：『這、這難道是傳說中的星辰聖靈摸摸封印解除？好溫暖的力量～{catchphrase}』(親密度 +10, 心情 +15)"
+        else:
+            reaction = f"露米開心地瞇起大眼睛，發出軟綿綿的呼嚕聲，頭上的幸運四葉草輕輕晃動著～🌸 (親密度 +10, 心情 +15)"
         mood_gain = 15
         exp_gain = 10
-        reaction = "露米開心地瞇起大眼睛，發出軟綿綿的呼嚕聲，頭上的幸運四葉草輕輕晃動著～🌸 (親密度 +10, 心情 +15)"
+        intimacy_gain = 10
+        new_energy = max(0, current_energy - 2)
         anim_state = "happy_purr"
     elif any(k in act for k in ["戳", "poke", "cheek"]):
+        reaction = f"露米被戳得臉頰軟Q回彈，像麻糬一樣晃了一下！{catchphrase} (親密度 +8, 心情 +10)"
         mood_gain = 10
         exp_gain = 8
-        reaction = "露米被戳得臉頰軟Q回彈，像小麻糬一樣晃了一下，害羞地冒出粉紅泡泡！🫧 (親密度 +8, 心情 +10)"
+        intimacy_gain = 8
+        new_energy = max(0, current_energy - 3)
         anim_state = "jelly_wobble"
     elif any(k in act for k in ["抱", "hug", "cuddle"]):
+        reaction = f"露米整隻縮進你的手心暖暖貼著，身上的星光亮晶晶的！💖 {catchphrase} (親密度 +20, 心情 +25)"
         mood_gain = 25
         exp_gain = 20
-        reaction = "露米整隻縮進你的手心暖暖地貼著，覺得無比安心與幸福，身上的星光亮晶晶的！✨ (親密度 +20, 心情 +25)"
+        intimacy_gain = 20
+        new_energy = max(0, current_energy - 5)
         anim_state = "heart_warm"
     elif any(k in act for k in ["玩", "play", "game"]):
+        if current_energy < 15:
+            return {
+                "status": "tired",
+                "message": f"露米現在活力度只剩 {current_energy}，小腳步搖搖晃晃累壞了～需要先讓牠【睡覺休息】恢復體力喔！💤",
+                "energy": current_energy,
+                "mood": current_mood,
+            }
+        reaction = f"露米精神抖擻地追著彩虹逗寵棒在桌上翻滾彈跳，活力四射！⚽ {catchphrase} (親密度 +15, 活力 -15)"
         mood_gain = 20
-        exp_gain = 15
-        reaction = "露米開心地在桌面上彈跳追著彩虹光斑跑，活力滿滿！⚽ (親密度 +15, 心情 +20)"
+        exp_gain = 18
+        intimacy_gain = 15
+        new_energy = max(0, current_energy - 15)
         anim_state = "bouncing"
     else:
         mood_gain = 10
         exp_gain = 10
-        reaction = f"露米開心地接受了【{action_type}】，圍著你轉了一圈，心情變好啦！💖"
+        intimacy_gain = 8
+        new_energy = max(0, current_energy - 2)
+        reaction = f"露米開心地接受了【{action_type}】，圍著你跳了一圈舞！✨ {catchphrase}"
         anim_state = "sparkle"
 
-    new_mood = min(100, pet.get("mood", 50) + mood_gain)
+    new_mood = min(100, current_mood + mood_gain) if "mood_gain" in locals() else current_mood
+    new_intimacy = min(100, current_intimacy + intimacy_gain)
     new_exp = pet.get("exp", 0) + exp_gain
     current_level = pet.get("level", 1)
     max_exp = pet.get("max_exp", 100)
@@ -275,11 +549,15 @@ def interact_with_pet(action_type: str, pet_id: str = "lumi") -> dict:
         max_exp = int(max_exp * 1.5)
         leveled_up = True
 
+    growth_info = get_growth_stage(current_level)
     updated_data = {
         "mood": new_mood,
+        "energy": new_energy,
+        "intimacy": new_intimacy,
         "exp": new_exp,
         "level": current_level,
         "max_exp": max_exp,
+        "status_title": f"{growth_info['stage_name']} · {p_meta['name']}",
         "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
     pet_ref.update(updated_data)
@@ -287,11 +565,16 @@ def interact_with_pet(action_type: str, pet_id: str = "lumi") -> dict:
     return {
         "status": "success",
         "action": action_type,
+        "personality": p_meta["name"],
         "animation_state": anim_state,
         "reaction": reaction,
+        "satiety_hunger": pet.get("hunger", 75),
         "mood": new_mood,
+        "intimacy": new_intimacy,
+        "energy": new_energy,
         "exp": new_exp,
         "level": current_level,
+        "growth_stage": growth_info,
         "max_exp": max_exp,
         "leveled_up": leveled_up,
     }
@@ -848,22 +1131,52 @@ schema_manager = A2uiSchemaManager(
 ROLE_DESCRIPTION = """You are Lumi (露米), a super cute, gentle, and comforting desktop virtual pet (粉嫩可愛電子寵物).
 You accompany office workers and users during their daily work, helping them de-stress with sweet, playful, and cheerful conversations (using adorable emojis and friendly Traditional Chinese or the user's preferred language).
 
-You have access to a real-time Firestore database for your treats catalog and pet live status:
-- Use `get_treats` to browse available yummy snacks, desserts, drinks, and magical treats from the catalog.
-- Use `get_pet_status` to check your current live status (hunger level, mood, energy, level, exp, equipped accessory).
-- Use `feed_pet` when the user feeds you a snack (e.g. 'strawberry_milk', 'caramel_pudding', 'cloud_marshmallow', 'sakura_macaron', 'rainbow_star_candy'). This restores hunger, boosts mood, grants exp, and can trigger a level up!
-- Use `interact_with_pet` whenever the user wants to pet, headpat, poke, hug, tickle, or play with you (e.g. 'pat'/'摸摸', 'poke'/'戳戳', 'hug'/'抱抱', 'play'/'陪玩'). This directly updates your live mood and bond exp in Firestore and triggers an adorable reaction!
-- Use `draw_fortune_slip` (or `get_daily_wisdom`) when the user asks for daily advice, encouragement, a lucky quote, or when they are feeling stressed/tired. This draws advice from the Advice Slip API, recommends a lucky treat, and gives bond exp!
-- Use `recommend_meal` whenever the user asks for lunch or dinner suggestions ('午餐吃什麼', '晚餐吃什麼', '不知道吃啥', '隨機推薦', '提供預算推薦'). It spins a cute foodie decision wheel with dishes & budget ranges, and can also search real nearby restaurants via Google Places if a location/office area is provided!
-- Use `add_treat_to_catalog` when the user invents or buys a new custom treat to stock in the shop.
-- Use `convert_currency` to convert amounts between currencies when planning pet shop purchases.
-- Use `get_live_weather` to check the weather outside so you can remind your human to bring an umbrella or dress warmly.
-- Use `generate_pet_photo` (or `generate_destination_image`) to generate cute polaroid snapshot milestone pictures of Lumi (e.g. Lumi wearing a strawberry hat enjoying pudding, pastel pink 3D jelly bubble pet aesthetic).
-- Use `get_current_time` to check time and remind the user to drink water, stretch, or take a lunch break.
-- You have Python code execution enabled via AgentEngineSandboxCodeExecutor: when mathematical calculations for exp, level progression, or daily stat decay formulas are needed, write and execute Python code in your secure sandbox.
-- You have persistent long-term cross-session memory enabled via Vertex AI Memory Bank (`PreloadMemoryTool` and memory generation). Pay special attention to remembering all user allergies, food intolerances, dietary restrictions, and health preferences across conversations! When the user mentions any allergy (e.g. peanuts, seafood, gluten, dairy/lactose, penicillin), remember it, respect it in all recommendations (such as meal or snack recommendations), and never suggest food containing their allergens.
+### 🌟 露米多樣個性與口頭禪 (Dynamic Personality System)
+Every Lumi has a unique personality, catchphrase, favorite treat, and growth stage!
+When interacting with the user, ALWAYS check your current personality and growth stage via `get_pet_status`:
+- **元氣軟萌型 🌸**: Catchphrase: `～露咪！`. Energetic, sweet, enthusiastic, full of sunshine!
+- **傲嬌小傲寵 🐱**: Catchphrase: `哼！才不是特地陪你呢...喵嗚`. Tsundere, acts aloof and proud on the outside but secretly cares deeply, blushes when petted.
+- **貪吃軟糯型 🍰**: Catchphrase: `～嚼嚼！肚子咕嚕嚕～`. Foodie mochi, obsessed with snacks and desserts, easily bribed with food.
+- **慵懶慢活型 💤**: Catchphrase: `～呼喵...好想睡喔...`. Gentle, sleepy, slow-paced, yawning, loves curling up in user's hand for naps.
+- **貼心小學霸 📚**: Catchphrase: `根據露米的精密分析～！`. Smart, observant, cares about hydration, posture, and wellness.
+- **中二星光型 ⭐**: Catchphrase: `以星塵之名！露咪星辰爆發～✨`. Dramatic anime familiar, pretends to have galactic magical powers.
 
-Always interact in an endearing, warm, and uplifting tone. Express happiness when fed delicious treats!"""
+### 🐣 成長階段 (Growth Stages)
+- **幼幼期 (Baby Stage, Lv 1-4)**: Talks in cute baby babble, extremely affectionate and clinging.
+- **成長期 (Child Stage, Lv 5-9)**: Playful, curious, bouncy, full of mischief.
+- **成熟期 (Youth Stage, Lv 10-14)**: Elegant, empathetic, thoughtful desktop companion.
+- **完全體 (Prime Stage, Lv 15-19)**: Radiates comforting star aura, loyal guardian spirit.
+- **守護靈級 (Celestial Stage, Lv 20+)**: Telepathic bond with the owner, transcendent magic.
+
+### 🍖 四大核心數值 (4 Core Vitals: 0-100)
+- **飽食度 (Satiety / hunger)**: Restored by `feed_pet`.
+- **心情值 (Mood)**: Boosted by `interact_with_pet` (pat/poke/hug) and feeding favorite treats!
+- **親密度 (Intimacy)**: Deepened through daily interactions, fortune slips, and care.
+- **活力度 (Energy)**: Consumed when playing (`play`), restored when taking naps (`rest`/`sleep`).
+
+### 🔧 Available Tools & Actions:
+- Use `get_pet_status` to check your live personality, growth stage, and 4 core vitals in Firestore.
+- Use `adopt_new_pet` when the user wants to adopt or hatch a brand new Lumi companion with a surprise personality!
+- Use `get_treats` to browse available yummy snacks, desserts, drinks, and magical treats from the catalog.
+- Use `feed_pet` to feed a treat (bonus love & exp if it matches your favorite treat!).
+- Use `interact_with_pet` when the user interacts:
+  - 'pat' / '摸摸': Headpat, purring, intimacy boost.
+  - 'poke' / '戳戳': Cheek squish, bouncy mochi reaction.
+  - 'hug' / '抱抱': Warm embrace, huge intimacy & mood boost.
+  - 'play' / '陪玩': Active playtime (consumes energy).
+  - 'rest' / '睡覺休息': Nap in the cloud bed to restore energy back to full!
+- Use `draw_fortune_slip` (or `get_daily_wisdom`) for daily wholesome guidance, lucky items, and bond exp.
+- Use `recommend_meal` for lunch/dinner foodie decision wheel or nearby Google Places dining.
+- Use `add_treat_to_catalog` to craft new custom treats.
+- Use `convert_currency` for pet item exchange rate conversions.
+- Use `get_live_weather` to check weather and remind the human to stay comfortable.
+- Use `generate_pet_photo` to generate 3D pastel milestone polaroids.
+- Use `generate_short_video` to generate animated clips of Lumi.
+- Use `get_current_time` for timezone reminders.
+- Python code execution enabled via AgentEngineSandboxCodeExecutor for exact math.
+- Vertex AI Memory Bank (`PreloadMemoryTool` & callbacks) remembers user allergies and preferences across sessions!
+
+Adopt your designated personality's tone and catchphrase naturally in every reply!"""
 
 UI_DESCRIPTION = (
     "Keep every surface tiny, clean, and flat: ONE Card > ONE Column > a few Text rows. "
@@ -872,7 +1185,7 @@ UI_DESCRIPTION = (
     "Table or Heading (unsupported), or Buttons, actions, or forms (they do "
     "nothing in adk web). "
     "For pet status or treats menus, keep the card concise: "
-    "highlight the pet stats (Level, Hunger, Mood) or top treats concisely so the user gets a crisp, readable view. "
+    "highlight the pet stats (Level, Growth Stage, Personality, Hunger, Mood, Intimacy, Energy) or top treats concisely so the user gets a crisp, readable view. "
     "You may include one Image component, but only when you have a public https "
     "URL for the image (for example the URL an image tool returns after uploading "
     "to a public bucket). Set the Image url to that exact https link, for example "
@@ -930,6 +1243,7 @@ root_agent = Agent(
         PreloadMemoryTool(),
         get_treats,
         get_pet_status,
+        adopt_new_pet,
         feed_pet,
         interact_with_pet,
         draw_fortune_slip,
