@@ -1525,56 +1525,56 @@ LUMI_TRAVEL_SPOTS = [
     {
         "destination": "京都嵐山竹林與金閣寺 (Kyoto Arashiyama)",
         "country": "日本 🇯🇵",
-        "description": "露米戴著日式小斗笠漫步在青翠的嵐山竹林，還買了金箔抹茶冰淇淋吃得滿嘴綠～",
+        "description_template": "{pet_name} 戴著日式小斗笠漫步在青翠的嵐山竹林，還買了金箔抹茶冰淇淋吃得滿嘴綠～",
         "souvenir": "金閣寺限定御守 🎋",
         "treat_id": "matcha_dango",
         "treat_name": "宇治抹茶三色糰子",
-        "image_prompt": "A super cute pastel pink jelly creature (Lumi) wearing a tiny woven straw hat, holding a matcha dango stick, standing in a serene bamboo grove in Kyoto Japan with soft golden morning sunlight filtering through the bamboo trees, 3D clay pastel aesthetics, whimsical and heartwarming.",
+        "scene_prompt": "wearing a tiny woven straw hat, holding a matcha dango stick, standing happily in a serene bamboo grove in Kyoto Japan with soft golden morning sunlight filtering through bamboo trees, 3D clay pastel aesthetics, whimsical and heartwarming.",
     },
     {
         "destination": "巴黎艾菲爾鐵塔與塞納河畔 (Paris Eiffel Tower)",
         "country": "法國 🇫🇷",
-        "description": "露米戴著紅色小畫家貝雷帽坐在塞納河畔露天咖啡廳，在艾菲爾鐵塔前優雅品嚐酥脆馬卡龍！",
+        "description_template": "{pet_name} 戴著紅色小畫家貝雷帽坐在塞納河畔露天咖啡廳，在艾菲爾鐵塔前優雅品嚐酥脆馬卡龍！",
         "souvenir": "迷你艾菲爾鐵塔鑰匙圈 🗼",
         "treat_id": "sakura_macaron",
         "treat_name": "巴黎粉紅馬卡龍",
-        "image_prompt": "A tiny adorable pastel pink squishy creature (Lumi) wearing a French red beret hat, sitting at an outdoor bistro table with a cup of cafe latte and pink macarons, with the Eiffel Tower in the dreamy Paris background during sunset, cinematic pastel lighting, 3D cute clay art style.",
+        "scene_prompt": "wearing a French red beret hat, sitting at an outdoor bistro table with a cup of cafe latte and pink macarons, with the Eiffel Tower in the dreamy Paris background during sunset, cinematic pastel lighting, 3D cute clay art style.",
     },
     {
         "destination": "九份老街與紅燈籠茶樓 (Jiufen Old Street)",
         "country": "台灣 🇹🇼",
-        "description": "露米提著迷你紅燈籠穿梭在九份石階山城，在阿妹茶樓窗邊喝著高山烏龍茶看夕陽海景！",
+        "description_template": "{pet_name} 提著迷你紅燈籠穿梭在九份石階山城，在阿妹茶樓窗邊喝著高山烏龍茶看夕陽海景！",
         "souvenir": "九份手繪祈福天燈 🏮",
         "treat_id": "caramel_pudding",
         "treat_name": "九份手工古早味布丁",
-        "image_prompt": "A super cute round pastel pink jelly pet (Lumi) holding a glowing miniature red paper lantern, sitting on a wooden tea balcony in Jiufen Taiwan old street overlooking the dusk ocean, glowing warm lanterns everywhere, Miyazaki spirited aesthetic, 3D render cute illustration.",
+        "scene_prompt": "holding a glowing miniature red paper lantern, sitting on a wooden tea balcony in Jiufen Taiwan old street overlooking dusk ocean, glowing warm lanterns everywhere, Miyazaki spirited aesthetic, 3D render cute illustration.",
     },
     {
         "destination": "夏威夷威基基彩虹海灘 (Hawaii Waikiki Beach)",
         "country": "夏威夷 🌺",
-        "description": "露米戴著花朵花環和心形太陽眼鏡，在蔚藍海邊踩著小浪花、喝著新鮮鳳梨汁衝浪！",
+        "description_template": "{pet_name} 戴著花朵花環和心形太陽眼鏡，在蔚藍海邊踩著小浪花、喝著新鮮鳳梨汁衝浪！",
         "souvenir": "威基基彩虹貝殼項鍊 🐚",
         "treat_id": "rainbow_star_candy",
         "treat_name": "熱帶彩虹星星糖",
-        "image_prompt": "A tiny charming pastel pink jelly blob (Lumi) wearing a colorful Hawaiian flower lei and sunglasses, sitting on a mini surfboard on turquoise beach sand in Hawaii with palm trees and a rainbow in the sunny blue sky, cheerful 3D Pixar clay aesthetic.",
+        "scene_prompt": "wearing a colorful Hawaiian flower lei and sunglasses, sitting on a mini surfboard on turquoise beach sand in Hawaii with palm trees and a rainbow in sunny blue sky, cheerful 3D Pixar clay aesthetic.",
     },
     {
         "destination": "瑞士阿爾卑斯雪山小鎮 (Swiss Alps & Zermatt)",
         "country": "瑞士 🇨🇭",
-        "description": "露米裹著毛線小圍巾在積雪的馬特洪峰下堆雪人，還帶回了香濃的瑞士高山起司！",
+        "description_template": "{pet_name} 裹著毛線小圍巾在積雪的馬特洪峰下堆雪人，還帶回了香濃的瑞士高山起司！",
         "souvenir": "阿爾卑斯小牛鈴 🔔",
         "treat_id": "cloud_marshmallow",
         "treat_name": "瑞士雪山棉花糖",
-        "image_prompt": "A cute fluffy pink jelly pet (Lumi) wrapped in a warm knitted wool scarf and earmuffs, happily building a tiny snow sculpture against the snowy Matterhorn mountain peaks in Switzerland, crisp winter blue sky, 3D warm clay style.",
+        "scene_prompt": "wrapped in a warm knitted wool scarf and earmuffs, happily building a tiny snow sculpture against snowy Matterhorn mountain peaks in Switzerland, crisp winter blue sky, 3D warm clay style.",
     },
     {
         "destination": "首爾星空圖書館與弘大咖啡廳 (Seoul Starfield Library)",
         "country": "韓國 🇰🇷",
-        "description": "露米在巨大的書牆前推著小眼鏡認真選書，還去了弘大喝超萌的草莓草莓奶昔！",
+        "description_template": "{pet_name} 在巨大的書牆前推著小眼鏡認真選書，還去了弘大喝超萌的草莓草莓奶昔！",
         "souvenir": "韓系可愛書籤與貼紙 📖",
         "treat_id": "strawberry_milk",
         "treat_name": "首爾草莓香蕉牛奶",
-        "image_prompt": "A cute pastel pink slime pet (Lumi) wearing tiny round reading glasses, sitting amongst tall glowing bookshelves of the Starfield library in Seoul, warm atmospheric golden ambient lighting, highly detailed 3D whimsical cute digital art.",
+        "scene_prompt": "wearing tiny round reading glasses, sitting amongst tall glowing bookshelves of the Starfield library in Seoul, warm atmospheric golden ambient lighting, highly detailed 3D whimsical cute digital art.",
     },
 ]
 
@@ -1602,10 +1602,15 @@ async def travel_adventure(
     pet_doc = pet_ref.get()
     pet = pet_doc.to_dict() if pet_doc.exists else {}
 
+    species_id = pet.get("species_id", "bubble_jelly")
+    sp_meta = PET_SPECIES.get(species_id, PET_SPECIES.get("bubble_jelly", {}))
+    pet_name = pet.get("name", sp_meta.get("default_name", "露米"))
+    visual_desc = pet.get("visual_desc", sp_meta.get("visual_desc", "圓滾滾粉嫩果凍小生物"))
+    accessory = pet.get("accessory", sp_meta.get("default_accessory", "小背囊"))
+
     p_id = pet.get("personality_id", "clingy")
     p_meta = PET_PERSONALITIES.get(p_id, LUMI_PERSONALITIES.get(p_id, PET_PERSONALITIES["clingy"]))
     catchphrase = pet.get("catchphrase", p_meta.get("catchphrase", p_meta.get("catchphrases", ["～露咪！"])[0]))
-    pet_name = pet.get("name", "露米")
 
     # Match destination or choose random/specified
     chosen_spot = None
@@ -1618,12 +1623,22 @@ async def travel_adventure(
     if not chosen_spot:
         chosen_spot = random.choice(LUMI_TRAVEL_SPOTS)
 
-    # 1. Generate the realistic travel postcard image using gemini-3.1-flash-lite-image & Cloud Storage
+    # 1. Dynamically build the image prompt featuring THIS specific pet species, accessories, and appearance!
+    dynamic_prompt = (
+        f"A postcard photograph of an adorable pet: {visual_desc}, named {pet_name}, equipped with {accessory}. "
+        f"The pet is currently {chosen_spot['scene_prompt']} "
+        f"Captivating 3D clay pastel character rendering, high quality Pixar style, rich atmospheric background."
+    )
+
+    # Generate the realistic travel postcard image using gemini-3.1-flash-lite-image & Cloud Storage
     photo_res = await generate_pet_photo(
-        prompt=chosen_spot["image_prompt"],
+        prompt=dynamic_prompt,
         tool_context=tool_context,
     )
     photo_url = photo_res.get("public_url", "")
+
+    # Format destination description with the actual pet name
+    dest_desc = chosen_spot.get("description_template", "").format(pet_name=pet_name) if "description_template" in chosen_spot else chosen_spot.get("description", "")
 
     # 2. Update pet vitals & experience from the journey
     # Travel boosts mood & intimacy immensely, consumes some energy, and gains rich exp
@@ -1683,7 +1698,7 @@ async def travel_adventure(
         "status": "success",
         "destination": chosen_spot["destination"],
         "country": chosen_spot["country"],
-        "description": chosen_spot["description"],
+        "description": dest_desc,
         "postcard_photo_url": photo_url,
         "souvenir": chosen_spot["souvenir"],
         "recommended_treat": chosen_spot["treat_name"],
