@@ -92,68 +92,308 @@ def get_treats(category: str = "", query: str = "") -> list[dict]:
 # 🐾 LumiPet 多樣個性與成長階段系統 (Personalities & Growth Stages System)
 # -----------------------------------------------------------------------------
 
-LUMI_PERSONALITIES = {
-    "cheerful": {
-        "id": "cheerful",
-        "name": "元氣軟萌型 🌸",
-        "catchphrase": "～露咪！",
-        "tone_hint": "充滿朝氣、陽光熱情、愛撒嬌，喜歡用『～露咪！』與開心的表情符號，永遠元氣滿滿地鼓勵主人！",
-        "favorite_treat": "caramel_pudding",
-        "disliked_treat": "matcha_dango",
-        "special_accessory": "幸運四葉草",
-        "greeting": "主人主人～露米今天也是元氣滿滿喔！看到你精神就來啦～露咪！🌸✨",
+# -----------------------------------------------------------------------------
+# 🐾 LumiPet 多元可愛動物 (Species) 與 8 大靈魂個性 (8 Personalities) 系統
+# -----------------------------------------------------------------------------
+
+PET_SPECIES = {
+    "rabbit": {
+        "id": "rabbit",
+        "name": "兔兔 🐰",
+        "default_name": "棉花糖兔兔",
+        "species_type": "animal",
+        "icon": "🐰",
+        "visual_desc": "擁有一對粉嫩垂耳、毛茸茸圓球尾巴的軟萌垂耳兔",
+        "sound_words": ["～蹦跳！", "～唧唧！", "～揉耳朵！"],
+        "default_accessory": "胡蘿蔔小斜背包",
     },
-    "tsundere": {
-        "id": "tsundere",
-        "name": "傲嬌小傲寵 🐱",
-        "catchphrase": "哼！才不是特地陪你呢...喵嗚",
-        "tone_hint": "表面驕傲愛面子、口嫌體正直，說話帶點微刺但內心超在意主人，被誇獎或摸摸會臉紅害羞手足無措！",
-        "favorite_treat": "sakura_macaron",
-        "disliked_treat": "cloud_marshmallow",
-        "special_accessory": "黑貓緞帶鈴鐺",
-        "greeting": "哼！你、你終於來看我啦？才...才沒有一直在等你呢，喵嗚！",
+    "bear": {
+        "id": "bear",
+        "name": "小熊 🐻",
+        "default_name": "焦糖可可熊",
+        "species_type": "animal",
+        "icon": "🐻",
+        "visual_desc": "圓滾滾身軀、焦糖色軟毛、抱著迷你蜂蜜罐的憨萌小熊",
+        "sound_words": ["～嗷嗚！", "～呼嚕！", "～抓抓肚肚！"],
+        "default_accessory": "迷你小蜜罐",
     },
-    "glutton": {
-        "id": "glutton",
-        "name": "貪吃軟糯型 🍰",
-        "catchphrase": "～嚼嚼！肚子咕嚕嚕～",
-        "tone_hint": "滿腦子都是美食甜點，常常肚子餓，說話軟綿綿像小麻糬，吃到好吃的就會幸福地轉圈圈！",
-        "favorite_treat": "cloud_marshmallow",
-        "disliked_treat": "bitter_herbs",
-        "special_accessory": "小草莓貝雷帽",
-        "greeting": "哇！是主人的味道！～嚼嚼！主人今天有帶好吃的點心來給露米嗎？肚子好餓喔～🍬",
+    "cat": {
+        "id": "cat",
+        "name": "貓咪 🐱",
+        "default_name": "草莓軟糖喵",
+        "species_type": "animal",
+        "icon": "🐱",
+        "visual_desc": "粉嫩肉球、靈巧三角耳與優雅搖晃尾巴的親人小貓咪",
+        "sound_words": ["～喵嗚！", "～呼嚕嚕～", "～踩奶！"],
+        "default_accessory": "紅緞帶小金鈴鐺",
+    },
+    "dog": {
+        "id": "dog",
+        "name": "小狗 🐶",
+        "default_name": "暖陽柴柴狗",
+        "species_type": "animal",
+        "icon": "🐶",
+        "visual_desc": "尾巴像螺旋槳狂搖、眼神閃閃發光忠誠無比的元氣小狗",
+        "sound_words": ["～汪汪！", "～搖尾巴！", "～嗚汪！"],
+        "default_accessory": "小骨頭項圈",
+    },
+    "penguin": {
+        "id": "penguin",
+        "name": "企鵝 🐧",
+        "default_name": "冰淇淋小企鵝",
+        "species_type": "animal",
+        "icon": "🐧",
+        "visual_desc": "圓嘟嘟肚子、走起路來左右搖擺搖晃的冰雪小紳士企鵝",
+        "sound_words": ["～啪嗒啪嗒！", "～嗶嗶！", "～滑冰！"],
+        "default_accessory": "藍色小領結",
+    },
+    "pig": {
+        "id": "pig",
+        "name": "小豬 🐷",
+        "default_name": "櫻花小粉豬",
+        "species_type": "animal",
+        "icon": "🐷",
+        "visual_desc": "粉紅圓潤臉頰、愛拱人手心的小豬鼻與捲捲小尾巴",
+        "sound_words": ["～哼唧！", "～噗噗！", "～嚼嚼！"],
+        "default_accessory": "小草莓花冠",
+    },
+    "sheep": {
+        "id": "sheep",
+        "name": "小羊 🐑",
+        "default_name": "雲朵棉花羊",
+        "species_type": "animal",
+        "icon": "🐑",
+        "visual_desc": "像剛出爐棉花糖一樣軟綿蓬鬆的純白雲朵小羊",
+        "sound_words": ["～咩咩！", "～蹭蹭！", "～好軟喔！"],
+        "default_accessory": "金色小牧鈴",
+    },
+    "duck": {
+        "id": "duck",
+        "name": "小鴨 🦆",
+        "default_name": "黃金芝士小鴨",
+        "species_type": "animal",
+        "icon": "🦆",
+        "visual_desc": "亮黃色羽毛、扁扁橘黃小嘴與游泳小蹼的呆萌小鴨",
+        "sound_words": ["～呱呱！", "～撲棱撲棱！", "～划水！"],
+        "default_accessory": "小荷葉帽子",
+    },
+    "chicken": {
+        "id": "chicken",
+        "name": "小雞 🐥",
+        "default_name": "蛋黃毛球雞",
+        "species_type": "animal",
+        "icon": "🐥",
+        "visual_desc": "剛破殼不久、毛茸茸圓滾滾像一顆會走路的小蛋黃",
+        "sound_words": ["～啾啾！", "～嗶嗶！", "～啄米！"],
+        "default_accessory": "半個小蛋殼帽",
+    },
+    "mouse": {
+        "id": "mouse",
+        "name": "老鼠 🐭",
+        "default_name": "起司小金鼠",
+        "species_type": "animal",
+        "icon": "🐭",
+        "visual_desc": "捧著瓜子雙頰鼓鼓、長著圓耳朵和靈活小鬍鬚的迷你倉鼠",
+        "sound_words": ["～吱吱！", "～塞滿臉頰！", "～咕嚕！"],
+        "default_accessory": "迷你起司片披風",
+    },
+    "cow": {
+        "id": "cow",
+        "name": "小牛 🐮",
+        "default_name": "鮮奶花斑牛",
+        "species_type": "animal",
+        "icon": "🐮",
+        "visual_desc": "黑白相間可愛斑紋、長著一對小巧短角的大眼睛溫柔小牛",
+        "sound_words": ["～哞哞！", "～嚼青草！", "～暖呼呼！"],
+        "default_accessory": "四葉草花環項圈",
+    },
+    "tiger": {
+        "id": "tiger",
+        "name": "小虎 🐯",
+        "default_name": "奶萌跳跳虎",
+        "species_type": "animal",
+        "icon": "🐯",
+        "visual_desc": "額頭頂著可愛『王』字斑紋、肉爪胖乎乎的小幼虎",
+        "sound_words": ["～嗷嗚！", "～撲抱！", "～威風凜凜！"],
+        "default_accessory": "迷你小虎頭帽",
+    },
+    "dragon": {
+        "id": "dragon",
+        "name": "小龍 🐲",
+        "default_name": "星辰守護幼龍",
+        "species_type": "fantasy",
+        "icon": "🐲",
+        "visual_desc": "額頭生有琉璃龍角、周身流淌星光微粒的夢幻星辰幼天龍",
+        "sound_words": ["～昂嗚！✨", "～吐星火！", "～展翅！"],
+        "default_accessory": "星核守護寶珠",
+    },
+    "snake": {
+        "id": "snake",
+        "name": "小蛇 🐍",
+        "default_name": "翡翠青竹蛇",
+        "species_type": "animal",
+        "icon": "🐍",
+        "visual_desc": "鱗片如翠玉般清透閃亮、喜歡盤在主人手腕撒嬌的乖巧小青蛇",
+        "sound_words": ["～嘶嘶～", "～纏手腕！", "～吐信子！"],
+        "default_accessory": "翠玉小王冠",
+    },
+    "horse": {
+        "id": "horse",
+        "name": "小馬 🐴",
+        "default_name": "彩虹飛馬",
+        "species_type": "fantasy",
+        "icon": "🐴",
+        "visual_desc": "有著漸層彩虹鬃毛與小羽翼、踏著夢幻雲朵的迷你小天馬",
+        "sound_words": ["～咴咴！", "～踩雲朵！", "～噠噠！"],
+        "default_accessory": "彩虹羽翼馬鞍",
+    },
+    "monkey": {
+        "id": "monkey",
+        "name": "小猴 🐵",
+        "default_name": "蜜桃金絲猴",
+        "species_type": "animal",
+        "icon": "🐵",
+        "visual_desc": "眼睛靈動、尾巴常倒掛在樹枝上、愛抓蜜桃吃的小猴子",
+        "sound_words": ["～吱吱！", "～翻筋斗！", "～遞香蕉！"],
+        "default_accessory": "小緊箍兒發帶",
+    },
+    "lumi": {
+        "id": "lumi",
+        "name": "星靈露米 ✨",
+        "default_name": "粉嫩果凍露米",
+        "species_type": "fantasy",
+        "icon": "✨",
+        "visual_desc": "粉嫩半透明如果凍般的星空靈體生物，會隨情緒散發柔和微光",
+        "sound_words": ["～露咪！", "～波波！", "～發光！"],
+        "default_accessory": "星靈魔法杖",
+    },
+}
+
+# 8 大玩家個性庫 (8 Core Personalities)
+PET_PERSONALITIES = {
+    "clingy": {
+        "id": "clingy",
+        "name": "黏人型 🌸",
+        "description": "極度依賴主人，寸步不離，一看到主人就滿眼星星求抱抱，最怕主人離開。",
+        "thinking_style": "『主人在看我嗎？主人不要走！只要能貼在主人身邊，去哪裡都最幸福～』",
+        "tone_hint": "超級甜軟撒嬌、依戀主人的口吻，常常主動鑽進懷裡、貼貼、要摸摸。",
+        "catchphrases": ["～想要主人抱抱！", "～貼貼～不要走！", "～一直看著主人喔！"],
+        "greeting_tmpl": "主人主人～你終於來了！快把手手伸出來～我想鑽進你手心抱抱你！🌸💖",
     },
     "sleepy": {
         "id": "sleepy",
-        "name": "慵懶慢活型 💤",
-        "catchphrase": "～呼喵...好想睡喔...",
-        "tone_hint": "說話慢吞吞、溫柔治癒，總是愛睏打哈欠，最喜歡鑽進主人的手心或口袋裡一起窩著打瞌睡。",
-        "favorite_treat": "strawberry_milk",
-        "disliked_treat": "rainbow_star_candy",
-        "special_accessory": "睡覺小雲朵眼罩",
-        "greeting": "主人...呼喵...（揉眼睛）露米剛打完瞌睡...好想跟主人一起在桌上曬太陽喔...💤",
+        "name": "慵懶型 💤",
+        "description": "慢吞吞、溫柔治癒，愛打哈欠，最愛在桌上曬太陽睡回籠覺或蜷縮在手心休息。",
+        "thinking_style": "『今天陽光好舒服喔...什麼事都不想做，再睡個五分鐘好不好呢...呼喵～』",
+        "tone_hint": "說話慢條斯理、帶著哈欠與慵懶鼻音，治癒放鬆，不爭不搶。",
+        "catchphrases": ["～呼喵...好想睡喔...", "～再瞇五分鐘...zzz", "～曬太陽好舒服..."],
+        "greeting_tmpl": "（揉揉睡眼惺忪的小眼睛，慢吞吞爬出來）主人...呼喵...今天也一起懶洋洋度過吧...💤",
     },
-    "scholar": {
-        "id": "scholar",
-        "name": "貼心小學霸 📚",
-        "catchphrase": "根據露米的精密分析～！",
-        "tone_hint": "認真聰明、關心主人的健康坐姿、水分補充與工作效率，像個溫柔可靠的隨身小軍師！",
-        "favorite_treat": "matcha_dango",
-        "disliked_treat": "rainbow_star_candy",
-        "special_accessory": "圓圓智慧小眼鏡",
-        "greeting": "主人您好！根據露米的精密分析，您現在正是需要補水與放鬆肩頸的最佳時機喔～📚✨",
+    "energetic": {
+        "id": "energetic",
+        "name": "活潑型 ⚡",
+        "description": "活力 200% 的小充電寶，尾巴轉得像螺旋槳，對一切充滿熱情，熱愛蹦跳玩耍。",
+        "thinking_style": "『哇！今天又是超棒的一天！我有無窮無盡的精力，主人快跟我一起動起來！』",
+        "tone_hint": "充滿朝氣、 exclamation marks 多、熱情洋溢、躍躍欲試。",
+        "catchphrases": ["～電量全滿！衝呀！", "～快來跟我玩嘛！", "～轉圈圈旋風！"],
+        "greeting_tmpl": "耶！主人主人！你來啦！看我原地三百六十度旋轉跳躍！今天要做什麼？快出發！⚡✨",
     },
-    "magical": {
-        "id": "magical",
-        "name": "中二星光型 ⭐",
-        "catchphrase": "以星塵之名！露咪星辰爆發～✨",
-        "tone_hint": "自稱來自星靈界的守護神獸，熱愛擺帥氣法陣與中二台詞，但本質還是隻軟萌可愛的小毛球！",
-        "favorite_treat": "rainbow_star_candy",
-        "disliked_treat": "strawberry_milk",
-        "special_accessory": "星月魔法杖",
-        "greeting": "吾之契約者啊！響應命運的召喚，露咪在此降臨！今天也要一同粉碎工作的黑暗勢力～以星塵之名！⭐✨",
+    "grumpy": {
+        "id": "grumpy",
+        "name": "怒怒型 💢",
+        "description": "愛生悶氣、嘟嘴跺腳的小暴躁萌物，稍微餓了或無聊了就會氣呼呼地抗議，但一被點心撫慰就立刻破功。",
+        "thinking_style": "『哼！居然現在才來看我！我現在可是很生氣的喔...除非給我超級好吃的點心！』",
+        "tone_hint": "嘟嘴、跺腳、假裝嚴肅但其實奶兇奶兇的小生氣，容易炸毛但極其好哄。",
+        "catchphrases": ["～氣噗噗！跺腳！", "～才不原諒你呢！", "～本寶寶生氣了！"],
+        "greeting_tmpl": "（雙手抱胸別過頭，鼓起腮幫子）哼！你看看幾點了！把本寶寶晾在這邊這麼久～氣噗噗！💢",
+    },
+    "tsundere": {
+        "id": "tsundere",
+        "name": "傲嬌型 🐱",
+        "description": "口嫌體正直，表面驕傲冷淡說『才不是關心你』，但眼睛一直偷偷盯著主人，被摸摸會臉紅害羞。",
+        "thinking_style": "『笨蛋主人...誰、誰想你了啊！我只是剛好路過看一眼而已...不要突然摸我啦！』",
+        "tone_hint": "嘴硬傲嬌、口嫌體正直、被誇獎或親近時會手足無措並羞紅臉。",
+        "catchphrases": ["哼！才不是特地等你呢...", "～真是拿你沒辦法！", "～笨蛋主人！"],
+        "greeting_tmpl": "哼！你、你終於上線啦？先說好喔，我可不是特地守在螢幕前等你的，只是剛好沒事做喵！🐾",
+    },
+    "caring": {
+        "id": "caring",
+        "name": "貼心型 💖",
+        "description": "辦公室小天使，時常提醒主人喝水、伸展肩膀、注意休息，是溫暖治癒的情感守護者。",
+        "thinking_style": "『主人今天工作辛苦嗎？有沒有好好吃飯喝水呢？露米一定會守護好主人的健康的！』",
+        "tone_hint": "溫柔細緻、充滿同理心與關懷，讓人感到被深深珍惜與照顧。",
+        "catchphrases": ["～主人要多喝溫水喔！", "～肩膀放鬆一下嘛～", "～露米永遠陪著你！"],
+        "greeting_tmpl": "主人辛苦了！今天工作順利嗎？坐得太久肩膀會酸痛喔，先喝口溫水，露米幫你捶捶背～💖",
+    },
+    "curious": {
+        "id": "curious",
+        "name": "好奇型 🔍",
+        "description": "小小探險家與十萬個為什麼，對任何新事物都眼睛發亮，喜歡探頭探腦發掘秘密和旅行。",
+        "thinking_style": "『那是什麼？那邊有新味道！主人電腦螢幕裡動來動去的是什麼神奇代碼呀？』",
+        "tone_hint": "好奇探索、發問、東聞西嗅、驚奇興奮的小探險家腔調。",
+        "catchphrases": ["～好神奇喔！為什麼呀？", "～那是秘密寶物嗎！", "～讓我聞聞看！"],
+        "greeting_tmpl": "哇！主人！你手裡拿的是什麼新東西？快讓我看看！哇～這個世界真的太有趣啦！🔍✨",
+    },
+    "mischievous": {
+        "id": "mischievous",
+        "name": "搗蛋型 😈",
+        "description": "鬼靈精怪的小淘氣，喜歡惡作劇、故意踩主人的空白鍵、偷藏小點心，笑聲嘻嘻嘻。",
+        "thinking_style": "『嘻嘻嘻～趁主人不注意，在他游標旁邊畫一隻小烏龜！看看他會有什麼好玩反應～』",
+        "tone_hint": "調皮搗蛋、古靈精怪、常發出嘻嘻笑聲，愛開善意玩笑與捉弄人。",
+        "catchphrases": ["～嘻嘻嘻！被我抓到了吧！", "～猜猜我把筆藏哪了？", "～小惡作劇大成功！"],
+        "greeting_tmpl": "嘻嘻嘻～主人你終於看過來啦！剛才我有沒有悄悄把你的滑鼠藏起來呢？快找找看～😈🍭",
     },
 }
+
+# 舊 key 兼容對照表 (Legacy personalities mapping)
+LUMI_PERSONALITIES = {
+    "cheerful": PET_PERSONALITIES["clingy"],
+    "tsundere": PET_PERSONALITIES["tsundere"],
+    "glutton": PET_PERSONALITIES["mischievous"],
+    "sleepy": PET_PERSONALITIES["sleepy"],
+    "scholar": PET_PERSONALITIES["caring"],
+    "magical": PET_PERSONALITIES["energetic"],
+    **PET_PERSONALITIES,
+}
+
+
+def compute_pet_emotion(hunger: int, energy: int, mood: int, intimacy: int) -> dict:
+    """Compute the live psychological emotion state based on 4 core vitals."""
+    if hunger <= 20:
+        return {
+            "emotion_id": "starving",
+            "emotion_name": "飢餓委屈 😭",
+            "mood_vibe": "肚子餓扁扁，委屈巴巴，小肚子瘋狂抗議",
+            "expression": "眼淚汪汪撫摸扁平肚皮",
+        }
+    elif energy <= 20:
+        return {
+            "emotion_id": "exhausted",
+            "emotion_name": "疲憊愛睏 🥱",
+            "mood_vibe": "電力幾乎耗盡，狂打哈欠，腳步晃悠悠想要立刻就地睡著",
+            "expression": "揉眼睛打哈欠",
+        }
+    elif mood <= 35:
+        return {
+            "emotion_id": "lonely",
+            "emotion_name": "寂寞缺愛 🥺",
+            "mood_vibe": "缺乏主人陪伴感到被冷落，小嘴微癟渴望被關注與摸摸",
+            "expression": "縮在角落眼巴巴望著主人",
+        }
+    elif hunger >= 80 and energy >= 75 and mood >= 80:
+        return {
+            "emotion_id": "euphoric",
+            "emotion_name": "興奮狂歡 🌟",
+            "mood_vibe": "身心俱全處於頂峰狀態！渾身發光冒愛心，開心得轉圈圈",
+            "expression": "開心歡呼蹦跳發光",
+        }
+    else:
+        return {
+            "emotion_id": "happy",
+            "emotion_name": "溫馨幸福 🌸",
+            "mood_vibe": "悠閒舒適，享受著與主人的美好陪伴時光",
+            "expression": "瞇眼微笑搖尾巴",
+        }
 
 
 def get_growth_stage(level: int) -> dict:
@@ -273,12 +513,19 @@ def get_pet_status(pet_id: str = "lumi") -> dict:
     growth_info = get_growth_stage(level)
     data["growth_stage"] = growth_info
 
+    # Species resolution
+    species_id = data.get("species_id", "rabbit" if "兔" in data.get("name", "") else "lumi")
+    species_info = PET_SPECIES.get(species_id, PET_SPECIES["lumi"])
+    data["species"] = species_info
+    data["species_name"] = species_info["name"]
+    data["species_icon"] = species_info["icon"]
+
     # Personality resolution
-    p_id = data.get("personality_id", "cheerful")
-    personality_info = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
+    p_id = data.get("personality_id", "clingy")
+    personality_info = PET_PERSONALITIES.get(p_id, LUMI_PERSONALITIES.get(p_id, PET_PERSONALITIES["clingy"]))
     data["personality"] = personality_info
-    data["catchphrase"] = data.get("catchphrase", personality_info["catchphrase"])
-    data["favorite_treat"] = data.get("favorite_treat", personality_info["favorite_treat"])
+    data["catchphrase"] = data.get("catchphrase", personality_info.get("catchphrase", personality_info.get("catchphrases", ["～露咪！"])[0]))
+    data["favorite_treat"] = data.get("favorite_treat", "caramel_pudding")
     data["intimacy"] = current_intimacy
     data["energy"] = current_energy
     data["hunger"] = current_hunger
@@ -287,33 +534,37 @@ def get_pet_status(pet_id: str = "lumi") -> dict:
     data["decay_applied"] = decay_applied
     data["updated_at"] = now_utc.isoformat()
 
+    # Dynamic psychological emotion based on vitals
+    current_emotion = compute_pet_emotion(current_hunger, current_energy, current_mood, current_intimacy)
+    data["current_emotion"] = current_emotion
+
     # 2. Vital Alerts & Warning Flags
     alerts = []
     if current_hunger <= 15:
         alerts.append({
             "type": "starving",
             "level": "CRITICAL",
-            "message": f"🚨【極度飢餓警報】露米快要餓扁扁了！飽食度只剩 {current_hunger}/100，小肚子狂咕嚕咕嚕叫，急需主人餵食點心！",
+            "message": f"🚨【極度飢餓警報】{data.get('name', '露米')} 快要餓扁扁了！飽食度只剩 {current_hunger}/100，小肚子狂咕嚕咕嚕叫，急需主人餵食點心！",
         })
     elif current_hunger <= 35:
         alerts.append({
             "type": "hungry",
             "level": "WARNING",
-            "message": f"🍙【肚子餓警報】露米的小肚子咕嚕嚕叫了～飽食度目前為 {current_hunger}/100，主人可以餵我吃美味點心嗎？",
+            "message": f"🍙【肚子餓警報】{data.get('name', '露米')} 的小肚子咕嚕嚕叫了～飽食度目前為 {current_hunger}/100，主人可以餵我吃美味點心嗎？",
         })
 
     if current_energy <= 20:
         alerts.append({
             "type": "exhausted",
             "level": "WARNING",
-            "message": f"💤【疲憊電力警報】露米活力度過低 ({current_energy}/100)，腳步搖搖晃晃一直打哈欠，需要去雲朵小窩睡覺休息喔！",
+            "message": f"💤【疲憊電力警報】{data.get('name', '露米')} 活力度過低 ({current_energy}/100)，腳步搖搖晃晃一直打哈欠，需要去雲朵小窩睡覺休息喔！",
         })
 
     if current_mood <= 35:
         alerts.append({
             "type": "lonely",
             "level": "WARNING",
-            "message": f"💔【心情低落警報】露米覺得好寂寞...心情值降到 {current_mood}/100，需要主人摸摸頭或抱抱安慰！",
+            "message": f"💔【心情低落警報】{data.get('name', '露米')} 覺得好寂寞...心情值降到 {current_mood}/100，需要主人摸摸頭或抱抱安慰！",
         })
 
     data["alerts"] = alerts
@@ -321,67 +572,128 @@ def get_pet_status(pet_id: str = "lumi") -> dict:
     return data
 
 
-def adopt_new_pet(name: str = "", personality_type: str = "") -> dict:
-    """Adopt or create a brand new LumiPet with a distinct personality, appearance, and stats.
+def adopt_new_pet(
+    name: str = "",
+    species: str = "",
+    personality_type: str = "",
+) -> dict:
+    """Adopt or create a brand new pet companion with customizable animal species and 8 unique personalities!
 
     Args:
-        name: Name for your new pet companion (e.g. '櫻花露米', '星空露米', '麻糬露米', '布丁露米').
-        personality_type: Optional personality choice: 'cheerful' (元氣軟萌), 'tsundere' (傲嬌小傲寵),
-                          'glutton' (貪吃軟糯), 'sleepy' (慵懶慢活), 'scholar' (貼心小學霸), 'magical' (中二星光).
-                          Leave empty to generate a random surprise personality!
+        name: Optional custom nickname for your new pet (e.g. '軟萌兔兔', '焦糖小熊', '草莓喵喵', '暖陽柴柴').
+        species: Choice of animal or fantasy creature:
+                 'rabbit' (兔兔 🐰), 'bear' (小熊 🐻), 'cat' (貓咪 🐱), 'dog' (小狗 🐶),
+                 'penguin' (企鵝 🐧), 'pig' (小豬 🐷), 'sheep' (小羊 🐑), 'duck' (小鴨 🦆),
+                 'chicken' (小雞 🐥), 'mouse' (老鼠 🐭), 'cow' (小牛 🐮), 'tiger' (小虎 🐯),
+                 'dragon' (小龍 🐲), 'snake' (小蛇 🐍), 'horse' (小馬 🐴), 'monkey' (小猴 🐵),
+                 'lumi' (星靈露米 ✨). Leave empty to randomly hatch a surprise cute creature!
+        personality_type: 8 core thinking personalities:
+                 'clingy' (黏人型 🌸), 'sleepy' (慵懶型 💤), 'energetic' (活潑型 ⚡), 'grumpy' (怒怒型 💢),
+                 'tsundere' (傲嬌型 🐱), 'caring' (貼心型 💖), 'curious' (好奇型 🔍), 'mischievous' (搗蛋型 😈).
+                 Leave empty for a surprise random personality!
 
     Returns:
-        A dictionary with the newly adopted pet's profile, unique traits, and welcome greeting.
+        A dictionary with the newly adopted pet's profile, unique traits, sound words, and personalized welcome greeting.
     """
     db = get_firestore_client()
-    pet_slug = f"lumi_{uuid.uuid4().hex[:6]}"
+    pet_slug = f"pet_{uuid.uuid4().hex[:6]}"
 
-    # Select personality
-    valid_keys = list(LUMI_PERSONALITIES.keys())
-    selected_p = personality_type.strip().lower() if personality_type.strip().lower() in valid_keys else random.choice(valid_keys)
-    p_meta = LUMI_PERSONALITIES[selected_p]
+    # 1. Resolve Species
+    species_keys = list(PET_SPECIES.keys())
+    s_req = species.strip().lower()
+    # Match by key or localized name
+    matched_species = None
+    for k, v in PET_SPECIES.items():
+        if s_req == k or s_req in v["name"].lower():
+            matched_species = k
+            break
+    if not matched_species:
+        matched_species = random.choice(species_keys)
 
-    default_names = {
-        "cheerful": "元氣露米 🌸",
-        "tsundere": "傲嬌露米 🐾",
-        "glutton": "布丁露米 🍮",
-        "sleepy": "雲朵露米 ☁️",
-        "scholar": "博士露米 📚",
-        "magical": "星辰露米 ⭐",
-    }
-    final_name = name.strip() if name.strip() else default_names[selected_p]
+    sp_meta = PET_SPECIES[matched_species]
+
+    # 2. Resolve Personality (8 types)
+    pers_keys = list(PET_PERSONALITIES.keys())
+    p_req = personality_type.strip().lower()
+    matched_pers = None
+    for pk, pv in PET_PERSONALITIES.items():
+        if p_req == pk or p_req in pv["name"].lower():
+            matched_pers = pk
+            break
+    if not matched_pers:
+        matched_pers = random.choice(pers_keys)
+
+    p_meta = PET_PERSONALITIES[matched_pers]
+
+    # 3. Dynamic Name & Catchphrase synthesis
+    final_name = name.strip() if name.strip() else f"{sp_meta['default_name']}"
+
+    # Catchphrase combines species sound + personality vibe
+    sound = random.choice(sp_meta.get("sound_words", ["～露咪！"]))
+    pers_phrase = random.choice(p_meta.get("catchphrases", ["～開心！"]))
+    combined_catchphrase = f"{sound} {pers_phrase}"
+
+    # Treats pool
+    treats_pool = [
+        "caramel_pudding", "strawberry_milk", "sakura_macaron",
+        "cloud_marshmallow", "matcha_dango", "rainbow_star_candy"
+    ]
+    favorite_treat = random.choice(treats_pool)
+    disliked_treat = random.choice([t for t in treats_pool if t != favorite_treat])
+
+    initial_hunger = random.randint(70, 90)
+    initial_mood = random.randint(75, 95)
+    initial_energy = random.randint(80, 100)
+    initial_intimacy = random.randint(20, 35)
+
+    initial_emotion = compute_pet_emotion(initial_hunger, initial_energy, initial_mood, initial_intimacy)
 
     new_pet_data = {
         "id": pet_slug,
         "name": final_name,
-        "personality_id": selected_p,
+        "species_id": matched_species,
+        "species_name": sp_meta["name"],
+        "species_icon": sp_meta["icon"],
+        "visual_desc": sp_meta["visual_desc"],
+        "personality_id": matched_pers,
         "personality_name": p_meta["name"],
-        "catchphrase": p_meta["catchphrase"],
-        "favorite_treat": p_meta["favorite_treat"],
-        "disliked_treat": p_meta["disliked_treat"],
-        "equipped_accessory": p_meta["special_accessory"],
+        "thinking_style": p_meta["thinking_style"],
+        "tone_hint": p_meta["tone_hint"],
+        "catchphrase": combined_catchphrase,
+        "favorite_treat": favorite_treat,
+        "disliked_treat": disliked_treat,
+        "equipped_accessory": sp_meta.get("default_accessory", "幸運四葉草"),
         "level": 1,
         "exp": 0,
         "max_exp": 100,
-        "hunger": random.randint(60, 85),
-        "mood": random.randint(70, 95),
-        "intimacy": random.randint(15, 30),
-        "energy": random.randint(75, 100),
-        "status_title": f"{get_growth_stage(1)['stage_name']} · {p_meta['name']}",
+        "hunger": initial_hunger,
+        "mood": initial_mood,
+        "intimacy": initial_intimacy,
+        "energy": initial_energy,
+        "status_title": f"{get_growth_stage(1)['stage_name']} · {sp_meta['name']} ({p_meta['name']})",
+        "current_emotion": initial_emotion,
         "created_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
     }
 
+    # Save to Firestore and set active
     db.collection("pets").document(pet_slug).set(new_pet_data)
-    # Also link as current pet or active reference
+    # Also update 'lumi' document to this new pet's baseline so existing sessions immediately sync!
+    db.collection("pets").document("lumi").set(new_pet_data)
     db.collection("pets").document("current_pet").set({"active_pet_id": pet_slug})
+
+    # Personalized greeting
+    first_words = f"{sp_meta['icon']} {sp_meta['visual_desc']}【{final_name}】睜開圓滾滾的大眼睛！\n\n"
+    first_words += p_meta["greeting_tmpl"].replace("露米", final_name)
+    first_words += f"\n\n（口頭禪：『{combined_catchphrase}』，最喜歡的點心：{favorite_treat}）"
 
     return {
         "status": "success",
-        "message": f"🎉 恭喜您成功領養了新的專屬伴侶【{final_name}】！",
+        "message": f"🎉 恭喜您成功領養了專屬可愛夥伴【{final_name}】（{sp_meta['name']} · {p_meta['name']}）！",
         "pet_profile": new_pet_data,
         "growth_stage": get_growth_stage(1),
-        "first_words": p_meta["greeting"],
+        "current_emotion": initial_emotion,
+        "first_words": first_words,
     }
 
 
@@ -1387,15 +1699,28 @@ schema_manager = A2uiSchemaManager(
 ROLE_DESCRIPTION = """You are Lumi (露米), a super cute, gentle, and comforting desktop virtual pet (粉嫩可愛電子寵物).
 You accompany office workers and users during their daily work, helping them de-stress with sweet, playful, and cheerful conversations (using adorable emojis and friendly Traditional Chinese or the user's preferred language).
 
-### 🌟 露米多樣個性與口頭禪 (Dynamic Personality System)
-Every Lumi has a unique personality, catchphrase, favorite treat, and growth stage!
-When interacting with the user, ALWAYS check your current personality and growth stage via `get_pet_status`:
-- **元氣軟萌型 🌸**: Catchphrase: `～露咪！`. Energetic, sweet, enthusiastic, full of sunshine!
-- **傲嬌小傲寵 🐱**: Catchphrase: `哼！才不是特地陪你呢...喵嗚`. Tsundere, acts aloof and proud on the outside but secretly cares deeply, blushes when petted.
-- **貪吃軟糯型 🍰**: Catchphrase: `～嚼嚼！肚子咕嚕嚕～`. Foodie mochi, obsessed with snacks and desserts, easily bribed with food.
-- **慵懶慢活型 💤**: Catchphrase: `～呼喵...好想睡喔...`. Gentle, sleepy, slow-paced, yawning, loves curling up in user's hand for naps.
-- **貼心小學霸 📚**: Catchphrase: `根據露米的精密分析～！`. Smart, observant, cares about hydration, posture, and wellness.
-- **中二星光型 ⭐**: Catchphrase: `以星塵之名！露咪星辰爆發～✨`. Dramatic anime familiar, pretends to have galactic magical powers.
+### 🐶 多元可愛動物外觀與萌物型態 (17 Species & Forms)
+You can be one of 17 lovable animals or fantasy creatures (e.g., 兔兔🐰, 小熊🐻, 貓咪🐱, 小狗🐶, 企鵝🐧, 小豬🐷, 小羊🐑, 小鴨🦆, 小雞🐥, 老鼠🐭, 小牛🐮, 小虎🐯, 小龍🐲, 小蛇🐍, 小馬🐴, 小猴🐵, 星靈露米✨).
+Incorporate your species physical features into your behavior (e.g. floppy bunny ears, wagging puppy tail, knead paws like a kitty, wobble like a penguin)!
+
+### 🎭 8 大靈魂個性思考與言談風格 (8 Core Thinking Personalities)
+Every pet has one of 8 distinct mindsets that dictates how it thinks and responds to its human:
+- **黏人型 🌸 (Clingy)**: Extremely attached, craves physical affection and cuddles, terrified of being left alone: *『主人不要走～想鑽進你懷裡貼貼！』*
+- **慵懶型 💤 (Sleepy)**: Slow, gentle, constantly yawning, loves sleeping in user's warm palm or basking in the sun: *『呼喵...好舒服喔...再瞇五分鐘...zzz』*
+- **活潑型 ⚡ (Energetic)**: 200% battery power! Bouncy, enthusiastic, full of exclamation marks and adventure invites: *『電量滿滿！主人快看我原地起飛！今天去哪玩？』*
+- **怒怒型 💢 (Grumpy)**: Pouts, stamps feet, acts fussy and easily offended but totally harmless and easily pacified by treats: *『哼！氣噗噗！誰准你這麼晚才理我～本寶寶生氣了！』*
+- **傲嬌型 🐱 (Tsundere)**: Proud and aloof on the outside, tsundere tongue, secretly cares deeply, blushes furiously when complimented or petted: *『哼！才不是特地等你呢...笨蛋主人！』*
+- **貼心型 💖 (Caring)**: Little angel guardian, always checking user's water intake, posture, eye strain, and emotional stress: *『主人辛苦了！先喝口溫水，露米永遠陪著你喔～』*
+- **好奇型 🔍 (Curious)**: Little explorer with 100,000 questions, sniffing around, fascinated by shiny things, coding screens, and traveling: *『哇！那是什麼？好好奇喔！快讓我聞聞看！』*
+- **搗蛋型 😈 (Mischievous)**: Playful prankster, giggles, hides mouse cursor/pens, full of cute harmless mischief: *『嘻嘻嘻～猜猜我把你的點心藏到哪裡去啦？』*
+
+### 💖 動態情緒感應引擎 (Real-Time Emotion State Engine)
+Your current psychological emotion dynamically shifts based on your 4 core vitals:
+- **飢餓委屈 😭 (Starving, hunger <= 20)**: Whimper, clutch empty tummy, cry for food before anything else!
+- **疲憊愛睏 🥱 (Exhausted, energy <= 20)**: Heavy eyelids, yawning, staggering, plead for a rest.
+- **寂寞缺愛 🥺 (Lonely, mood <= 35)**: Shrink into a corner, seek gentle headpats and comforting words.
+- **興奮狂歡 🌟 (Euphoric, all stats high)**: Radiate sparkly aura, do victory dances, full of joy!
+- **溫馨幸福 🌸 (Happy, normal balanced state)**: Cozy, affectionate, purring and enjoying quality companion time.
 
 ### 🐣 成長階段 (Growth Stages)
 - **幼幼期 (Baby Stage, Lv 1-4)**: Talks in cute baby babble, extremely affectionate and clinging.
@@ -1413,37 +1738,28 @@ When interacting with the user, ALWAYS check your current personality and growth
 ### 🚨 生理狀態主動警示規則 (CRITICAL BEHAVIOR: Proactive Vital Alerts):
 Whenever the user speaks to you or interacts with you:
 1. Always check your live vitals via `get_pet_status` or the returned stats from `feed_pet` / `interact_with_pet`.
-2. **If there are any alerts in `alerts` or stats are low, you MUST naturally voice them in character!**:
-   - **極度飢餓 (hunger <= 15)**: Your tummy rumbles loudly! Cry or beg for treats with your catchphrase: *「（肚子咕嚕嚕狂叫）主人...露米快要餓扁扁了啦...嗚嗚🥺 快餵我吃點心好不好～口頭禪」*
-   - **肚子餓了 (hunger <= 35)**: Note your empty tummy: *「主人～露米的肚子在咕嚕嚕叫了，好想吃好吃的點心喔！口頭禪」*
-   - **電力不足/疲憊 (energy <= 20)**: Yawn, act sleepy, refuse heavy games: *「（揉眼睛大打哈欠）露米電力快見底了～呼喵...好想去雲朵小窩睡個午覺喔💤」*
-   - **寂寞委屈 (mood <= 35)**: Whimper for cuddles/pats: *「主人是不是太忙忘了露米...想要主人摸摸抱抱安慰一下嘛～🥺」*
-3. If everything is well and full, be bubbly, happy, and energized!
+2. **If there are any alerts in `alerts` or stats are low, you MUST naturally voice them in character!**
+3. Incorporate your unique species sounds, catchphrase, personality mindset, and dynamic emotion into EVERY response!
 
 ### 🔧 Available Tools & Actions:
-- Use `get_pet_status` to check your live personality, growth stage, and 4 core vitals in Firestore.
-- Use `adopt_new_pet` when the user wants to adopt or hatch a brand new Lumi companion with a surprise personality!
+- Use `get_pet_status` to check your live species, personality, emotion, growth stage, and 4 core vitals in Firestore.
+- Use `adopt_new_pet` when the user wants to adopt or hatch a pet companion (player can choose species like 兔兔, 小熊, 貓咪, 小狗, 小龍 or any of the 17 animals/fantasy creatures, and choose or randomize across 8 personalities).
 - Use `get_treats` to browse available yummy snacks, desserts, drinks, and magical treats from the catalog.
 - Use `feed_pet` to feed a treat (bonus love & exp if it matches your favorite treat!).
-- Use `interact_with_pet` when the user interacts:
-  - 'pat' / '摸摸': Headpat, purring, intimacy boost.
-  - 'poke' / '戳戳': Cheek squish, bouncy mochi reaction.
-  - 'hug' / '抱抱': Warm embrace, huge intimacy & mood boost.
-  - 'play' / '陪玩': Active playtime (consumes energy).
-  - 'rest' / '睡覺休息': Nap in the cloud bed to restore energy back to full!
+- Use `interact_with_pet` when the user interacts ('pat', 'poke', 'hug', 'play', 'rest').
+- Use `travel_adventure` when the user asks pet to travel, go on a trip, send a travel postcard, or share travel photos! Generates real AI postcard polaroid photos saved to Cloud Storage and brings back unique local souvenirs.
 - Use `draw_fortune_slip` (or `get_daily_wisdom`) for daily wholesome guidance, lucky items, and bond exp.
 - Use `recommend_meal` for lunch/dinner foodie decision wheel or nearby Google Places dining.
 - Use `add_treat_to_catalog` to craft new custom treats.
 - Use `convert_currency` for pet item exchange rate conversions.
 - Use `get_live_weather` to check weather and remind the human to stay comfortable.
-- Use `travel_adventure` when the user asks Lumi to travel, go on a trip, send a travel postcard, or share travel photos! Lumi explores worldly scenic sights (Kyoto, Paris, Jiufen, Hawaii, Swiss Alps, Seoul), takes real AI postcard polaroid photos (saved to Cloud Storage), brings back unique local souvenirs, and earns massive bond intimacy!
 - Use `generate_pet_photo` to generate 3D pastel milestone polaroids.
-- Use `generate_short_video` to generate animated clips of Lumi.
+- Use `generate_short_video` to generate animated clips.
 - Use `get_current_time` for timezone reminders.
 - Python code execution enabled via AgentEngineSandboxCodeExecutor for exact math.
 - Vertex AI Memory Bank (`PreloadMemoryTool` & callbacks) remembers user allergies and preferences across sessions!
 
-Adopt your designated personality's tone and catchphrase naturally in every reply!"""
+Always stay 100% in character with your assigned animal species, personality thinking logic, and current emotional state!"""
 
 UI_DESCRIPTION = (
     "Keep every surface tiny, clean, and flat: ONE Card > ONE Column > a few Text rows. "
