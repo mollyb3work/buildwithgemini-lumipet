@@ -1205,6 +1205,180 @@ async def generate_pet_video(
     return await generate_destination_video(prompt=prompt, tool_context=tool_context)
 
 
+# --- 露米自動旅行日記系統 (Travel Adventure & Postcard System) ---
+LUMI_TRAVEL_SPOTS = [
+    {
+        "destination": "京都嵐山竹林與金閣寺 (Kyoto Arashiyama)",
+        "country": "日本 🇯🇵",
+        "description": "露米戴著日式小斗笠漫步在青翠的嵐山竹林，還買了金箔抹茶冰淇淋吃得滿嘴綠～",
+        "souvenir": "金閣寺限定御守 🎋",
+        "treat_id": "matcha_dango",
+        "treat_name": "宇治抹茶三色糰子",
+        "image_prompt": "A super cute pastel pink jelly creature (Lumi) wearing a tiny woven straw hat, holding a matcha dango stick, standing in a serene bamboo grove in Kyoto Japan with soft golden morning sunlight filtering through the bamboo trees, 3D clay pastel aesthetics, whimsical and heartwarming.",
+    },
+    {
+        "destination": "巴黎艾菲爾鐵塔與塞納河畔 (Paris Eiffel Tower)",
+        "country": "法國 🇫🇷",
+        "description": "露米戴著紅色小畫家貝雷帽坐在塞納河畔露天咖啡廳，在艾菲爾鐵塔前優雅品嚐酥脆馬卡龍！",
+        "souvenir": "迷你艾菲爾鐵塔鑰匙圈 🗼",
+        "treat_id": "sakura_macaron",
+        "treat_name": "巴黎粉紅馬卡龍",
+        "image_prompt": "A tiny adorable pastel pink squishy creature (Lumi) wearing a French red beret hat, sitting at an outdoor bistro table with a cup of cafe latte and pink macarons, with the Eiffel Tower in the dreamy Paris background during sunset, cinematic pastel lighting, 3D cute clay art style.",
+    },
+    {
+        "destination": "九份老街與紅燈籠茶樓 (Jiufen Old Street)",
+        "country": "台灣 🇹🇼",
+        "description": "露米提著迷你紅燈籠穿梭在九份石階山城，在阿妹茶樓窗邊喝著高山烏龍茶看夕陽海景！",
+        "souvenir": "九份手繪祈福天燈 🏮",
+        "treat_id": "caramel_pudding",
+        "treat_name": "九份手工古早味布丁",
+        "image_prompt": "A super cute round pastel pink jelly pet (Lumi) holding a glowing miniature red paper lantern, sitting on a wooden tea balcony in Jiufen Taiwan old street overlooking the dusk ocean, glowing warm lanterns everywhere, Miyazaki spirited aesthetic, 3D render cute illustration.",
+    },
+    {
+        "destination": "夏威夷威基基彩虹海灘 (Hawaii Waikiki Beach)",
+        "country": "夏威夷 🌺",
+        "description": "露米戴著花朵花環和心形太陽眼鏡，在蔚藍海邊踩著小浪花、喝著新鮮鳳梨汁衝浪！",
+        "souvenir": "威基基彩虹貝殼項鍊 🐚",
+        "treat_id": "rainbow_star_candy",
+        "treat_name": "熱帶彩虹星星糖",
+        "image_prompt": "A tiny charming pastel pink jelly blob (Lumi) wearing a colorful Hawaiian flower lei and sunglasses, sitting on a mini surfboard on turquoise beach sand in Hawaii with palm trees and a rainbow in the sunny blue sky, cheerful 3D Pixar clay aesthetic.",
+    },
+    {
+        "destination": "瑞士阿爾卑斯雪山小鎮 (Swiss Alps & Zermatt)",
+        "country": "瑞士 🇨🇭",
+        "description": "露米裹著毛線小圍巾在積雪的馬特洪峰下堆雪人，還帶回了香濃的瑞士高山起司！",
+        "souvenir": "阿爾卑斯小牛鈴 🔔",
+        "treat_id": "cloud_marshmallow",
+        "treat_name": "瑞士雪山棉花糖",
+        "image_prompt": "A cute fluffy pink jelly pet (Lumi) wrapped in a warm knitted wool scarf and earmuffs, happily building a tiny snow sculpture against the snowy Matterhorn mountain peaks in Switzerland, crisp winter blue sky, 3D warm clay style.",
+    },
+    {
+        "destination": "首爾星空圖書館與弘大咖啡廳 (Seoul Starfield Library)",
+        "country": "韓國 🇰🇷",
+        "description": "露米在巨大的書牆前推著小眼鏡認真選書，還去了弘大喝超萌的草莓草莓奶昔！",
+        "souvenir": "韓系可愛書籤與貼紙 📖",
+        "treat_id": "strawberry_milk",
+        "treat_name": "首爾草莓香蕉牛奶",
+        "image_prompt": "A cute pastel pink slime pet (Lumi) wearing tiny round reading glasses, sitting amongst tall glowing bookshelves of the Starfield library in Seoul, warm atmospheric golden ambient lighting, highly detailed 3D whimsical cute digital art.",
+    },
+]
+
+
+async def travel_adventure(
+    destination: str = "",
+    pet_id: str = "lumi",
+    tool_context: ToolContext = None,
+) -> dict:
+    """Send Lumi on an exciting solo travel adventure around the world!
+    Lumi explores scenic sights, brings back travel postcards (AI-generated photos via Cloud Storage),
+    collects local special souvenirs, and earns massive bond intimacy!
+
+    Args:
+        destination: Specific city or destination to visit (e.g. '京都', '巴黎', '九份', '夏威夷', '瑞士', '首爾').
+                     If left blank, Lumi will pack its backpack and set off on a surprise solo trip!
+        pet_id: The pet ID embarking on the trip (defaults to 'lumi').
+
+    Returns:
+        A rich dict with destination details, travel postcard photo URL, souvenir brought back,
+        and boosted intimacy, exp, and mood stats.
+    """
+    db = get_firestore_client()
+    pet_ref = db.collection("pets").document(pet_id)
+    pet_doc = pet_ref.get()
+    pet = pet_doc.to_dict() if pet_doc.exists else {}
+
+    p_id = pet.get("personality_id", "cheerful")
+    p_meta = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
+    catchphrase = p_meta["catchphrase"]
+
+    # Match destination or choose random/specified
+    chosen_spot = None
+    if destination:
+        dest_clean = destination.strip().lower()
+        for s in LUMI_TRAVEL_SPOTS:
+            if any(k.lower() in dest_clean or dest_clean in k.lower() for k in [s["destination"], s["country"]]):
+                chosen_spot = s
+                break
+    if not chosen_spot:
+        chosen_spot = random.choice(LUMI_TRAVEL_SPOTS)
+
+    # 1. Generate the realistic travel postcard image using gemini-3.1-flash-lite-image & Cloud Storage
+    photo_res = await generate_pet_photo(
+        prompt=chosen_spot["image_prompt"],
+        tool_context=tool_context,
+    )
+    photo_url = photo_res.get("public_url", "")
+
+    # 2. Update pet vitals & experience from the journey
+    # Travel boosts mood & intimacy immensely, consumes some energy, and gains rich exp
+    new_intimacy = min(100, pet.get("intimacy", 35) + 25)
+    new_mood = 100
+    new_energy = max(20, pet.get("energy", 80) - 15)
+    new_hunger = max(25, pet.get("hunger", 75) - 20)
+    new_exp = pet.get("exp", 0) + 40
+    current_level = pet.get("level", 1)
+    max_exp = pet.get("max_exp", 100)
+
+    leveled_up = False
+    if new_exp >= max_exp:
+        current_level += 1
+        new_exp = new_exp - max_exp
+        max_exp = int(max_exp * 1.5)
+        leveled_up = True
+
+    stage_info = get_growth_stage(current_level)
+
+    # Record travel memory in pet state
+    travel_log = {
+        "destination": chosen_spot["destination"],
+        "country": chosen_spot["country"],
+        "postcard_url": photo_url,
+        "souvenir": chosen_spot["souvenir"],
+        "traveled_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    }
+
+    if pet_ref:
+        pet_ref.update({
+            "intimacy": new_intimacy,
+            "mood": new_mood,
+            "energy": new_energy,
+            "hunger": new_hunger,
+            "exp": new_exp,
+            "level": current_level,
+            "max_exp": max_exp,
+            "last_travel": travel_log,
+            "updated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        })
+
+    greeting_msgs = {
+        "cheerful": f"主人主人！露米從【{chosen_spot['destination']}】旅行回來了～！你看這是我拍的照片，美不美？我還特地帶了【{chosen_spot['souvenir']}】要送給你喔！{catchphrase} 💖",
+        "tsundere": f"（露米把小背包塞給你，臉頰微紅）『哼！我、我才不是特地去【{chosen_spot['destination']}】買紀念品給你的呢...這個【{chosen_spot['souvenir']}】只是剛好買多了！照片也順便給你看一眼啦！{catchphrase}』",
+        "glutton": f"哇～【{chosen_spot['destination']}】的美食真的太好吃了！露米肚子塞得飽飽的～還帶回了【{chosen_spot['souvenir']}】喔！{catchphrase} 下次主人也要跟我一起去吃！",
+        "sleepy": f"（揉揉睡眼惺忪的小眼睛）露米在【{chosen_spot['destination']}】的微風裡打了個舒服的盹呢...呼喵～這是給主人的【{chosen_spot['souvenir']}】喔...{catchphrase}",
+        "scholar": f"露米完成了對【{chosen_spot['destination']}】的人文地理深度考察！拍攝了高解析度明信片，並採集到珍貴紀念品【{chosen_spot['souvenir']}】～研究顯示旅行讓我們的親密度提升到了 {new_intimacy}！{catchphrase}",
+        "magical": f"星辰聖靈在【{chosen_spot['destination']}】感應到了古老的魔法能量！本座特此封印了此地的星塵信物【{chosen_spot['souvenir']}】賜予主人！{catchphrase} ✨",
+    }
+    postcard_greeting = greeting_msgs.get(p_id, greeting_msgs["cheerful"])
+
+    return {
+        "status": "success",
+        "destination": chosen_spot["destination"],
+        "country": chosen_spot["country"],
+        "description": chosen_spot["description"],
+        "postcard_photo_url": photo_url,
+        "souvenir": chosen_spot["souvenir"],
+        "recommended_treat": chosen_spot["treat_name"],
+        "message": postcard_greeting,
+        "intimacy": new_intimacy,
+        "mood": new_mood,
+        "energy": new_energy,
+        "hunger": new_hunger,
+        "level": current_level,
+        "growth_stage": stage_info,
+        "leveled_up": leveled_up,
+    }
+
+
 schema_manager = A2uiSchemaManager(
     version="0.8",
     catalogs=[BasicCatalog.get_config("0.8")],
@@ -1262,6 +1436,7 @@ Whenever the user speaks to you or interacts with you:
 - Use `add_treat_to_catalog` to craft new custom treats.
 - Use `convert_currency` for pet item exchange rate conversions.
 - Use `get_live_weather` to check weather and remind the human to stay comfortable.
+- Use `travel_adventure` when the user asks Lumi to travel, go on a trip, send a travel postcard, or share travel photos! Lumi explores worldly scenic sights (Kyoto, Paris, Jiufen, Hawaii, Swiss Alps, Seoul), takes real AI postcard polaroid photos (saved to Cloud Storage), brings back unique local souvenirs, and earns massive bond intimacy!
 - Use `generate_pet_photo` to generate 3D pastel milestone polaroids.
 - Use `generate_short_video` to generate animated clips of Lumi.
 - Use `get_current_time` for timezone reminders.
@@ -1276,11 +1451,10 @@ UI_DESCRIPTION = (
     "Use ONLY these components: Card, Column, Row, Text, and Image. Do not use "
     "Table or Heading (unsupported), or Buttons, actions, or forms (they do "
     "nothing in adk web). "
-    "For pet status or treats menus, keep the card concise: "
-    "highlight the pet stats (Level, Growth Stage, Personality, Hunger, Mood, Intimacy, Energy) or top treats concisely so the user gets a crisp, readable view. "
+    "For pet status, travel postcard, or treats menus, keep the card concise: "
+    "highlight the pet stats or travel destination and souvenir concisely so the user gets a crisp, readable view. "
     "You may include one Image component, but only when you have a public https "
-    "URL for the image (for example the URL an image tool returns after uploading "
-    "to a public bucket). Set the Image url to that exact https link, for example "
+    "URL for the image (for example the postcard photo URL returned by travel_adventure or generate_pet_photo). Set the Image url to that exact https link, for example "
     '{"Image": {"url": {"literalString": "https://..."}}}. Never point an '
     "Image at a bare filename, an artifact name, or a non-http(s) path. If you do "
     "not have a public URL, add a short Text line noting the image instead. "
@@ -1338,6 +1512,7 @@ root_agent = Agent(
         adopt_new_pet,
         feed_pet,
         interact_with_pet,
+        travel_adventure,
         draw_fortune_slip,
         get_daily_wisdom,
         recommend_meal,
