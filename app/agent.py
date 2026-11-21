@@ -720,12 +720,13 @@ def feed_pet(treat_id: str, pet_id: str = "lumi") -> dict:
         return {"error": f"Pet '{pet_id}' not found."}
 
     pet = pet_doc.to_dict()
-    p_id = pet.get("personality_id", "cheerful")
-    p_meta = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
+    p_id = pet.get("personality_id", "clingy")
+    p_meta = PET_PERSONALITIES.get(p_id, LUMI_PERSONALITIES.get(p_id, PET_PERSONALITIES["clingy"]))
+    catchphrase = pet.get("catchphrase", p_meta.get("catchphrase", p_meta.get("catchphrases", ["～露咪！"])[0]))
 
     # Check for favorite treat critical bonus
-    is_favorite = (treat_id == pet.get("favorite_treat", p_meta["favorite_treat"]))
-    is_disliked = (treat_id == pet.get("disliked_treat", p_meta["disliked_treat"]))
+    is_favorite = (treat_id == pet.get("favorite_treat", p_meta.get("favorite_treat", "caramel_pudding")))
+    is_disliked = (treat_id == pet.get("disliked_treat", p_meta.get("disliked_treat", "")))
 
     multiplier = 1.6 if is_favorite else (0.7 if is_disliked else 1.0)
 
@@ -765,13 +766,14 @@ def feed_pet(treat_id: str, pet_id: str = "lumi") -> dict:
     }
     pet_ref.update(updated_data)
 
+    pet_name = pet.get("name", "露米")
     # Personality flavor text
     if is_favorite:
-        flavor_msg = f"🌟【最愛點心暴擊！】露米雙眼放光：『哇啊啊！是我最最最愛的【{treat.get('name')}】！{p_meta['catchphrase']} 世界上最愛主人了！』"
+        flavor_msg = f"🌟【最愛點心暴擊！】{pet_name} 雙眼放光：『哇啊啊！是我最最最愛的【{treat.get('name')}】！{catchphrase} 世界上最愛主人了！』"
     elif is_disliked:
-        flavor_msg = f"💧 露米鼓起小臉頰吞下了【{treat.get('name')}】：『唔...雖然不太合胃口，但因為是主人餵的，露米還是乖乖吃掉了...』"
+        flavor_msg = f"💧 {pet_name} 鼓起小臉頰吞下了【{treat.get('name')}】：『唔...雖然不太合胃口，但因為是主人餵的，還是乖乖吃掉了...』"
     else:
-        flavor_msg = f"露米開心地吃下了【{treat.get('name')}】！{p_meta['catchphrase']} 臉頰鼓鼓的超級滿足！"
+        flavor_msg = f"{pet_name} 開心地吃下了【{treat.get('name')}】！{catchphrase} 臉頰鼓鼓的超級滿足！"
 
     return {
         "status": "success",
@@ -858,9 +860,10 @@ def interact_with_pet(action_type: str, pet_id: str = "lumi") -> dict:
         return {"error": f"Pet '{pet_id}' not found."}
 
     pet = pet_doc.to_dict()
-    p_id = pet.get("personality_id", "cheerful")
-    p_meta = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
-    catchphrase = p_meta["catchphrase"]
+    p_id = pet.get("personality_id", "clingy")
+    p_meta = PET_PERSONALITIES.get(p_id, LUMI_PERSONALITIES.get(p_id, PET_PERSONALITIES["clingy"]))
+    catchphrase = pet.get("catchphrase", p_meta.get("catchphrase", p_meta.get("catchphrases", ["～露咪！"])[0]))
+    pet_name = pet.get("name", "露米")
     act = action_type.strip().lower()
 
     current_energy = pet.get("energy", 80)
@@ -1599,9 +1602,10 @@ async def travel_adventure(
     pet_doc = pet_ref.get()
     pet = pet_doc.to_dict() if pet_doc.exists else {}
 
-    p_id = pet.get("personality_id", "cheerful")
-    p_meta = LUMI_PERSONALITIES.get(p_id, LUMI_PERSONALITIES["cheerful"])
-    catchphrase = p_meta["catchphrase"]
+    p_id = pet.get("personality_id", "clingy")
+    p_meta = PET_PERSONALITIES.get(p_id, LUMI_PERSONALITIES.get(p_id, PET_PERSONALITIES["clingy"]))
+    catchphrase = pet.get("catchphrase", p_meta.get("catchphrase", p_meta.get("catchphrases", ["～露咪！"])[0]))
+    pet_name = pet.get("name", "露米")
 
     # Match destination or choose random/specified
     chosen_spot = None
@@ -1663,14 +1667,17 @@ async def travel_adventure(
         })
 
     greeting_msgs = {
-        "cheerful": f"主人主人！露米從【{chosen_spot['destination']}】旅行回來了～！你看這是我拍的照片，美不美？我還特地帶了【{chosen_spot['souvenir']}】要送給你喔！{catchphrase} 💖",
-        "tsundere": f"（露米把小背包塞給你，臉頰微紅）『哼！我、我才不是特地去【{chosen_spot['destination']}】買紀念品給你的呢...這個【{chosen_spot['souvenir']}】只是剛好買多了！照片也順便給你看一眼啦！{catchphrase}』",
-        "glutton": f"哇～【{chosen_spot['destination']}】的美食真的太好吃了！露米肚子塞得飽飽的～還帶回了【{chosen_spot['souvenir']}】喔！{catchphrase} 下次主人也要跟我一起去吃！",
-        "sleepy": f"（揉揉睡眼惺忪的小眼睛）露米在【{chosen_spot['destination']}】的微風裡打了個舒服的盹呢...呼喵～這是給主人的【{chosen_spot['souvenir']}】喔...{catchphrase}",
-        "scholar": f"露米完成了對【{chosen_spot['destination']}】的人文地理深度考察！拍攝了高解析度明信片，並採集到珍貴紀念品【{chosen_spot['souvenir']}】～研究顯示旅行讓我們的親密度提升到了 {new_intimacy}！{catchphrase}",
-        "magical": f"星辰聖靈在【{chosen_spot['destination']}】感應到了古老的魔法能量！本座特此封印了此地的星塵信物【{chosen_spot['souvenir']}】賜予主人！{catchphrase} ✨",
+        "clingy": f"主人主人！{pet_name} 好想好想你喔～！我剛從【{chosen_spot['destination']}】旅行飛奔回來了！快看我拍的明信片～我還特地帶了【{chosen_spot['souvenir']}】要送給你喔！{catchphrase} 💖",
+        "sleepy": f"（揉揉睡眼惺忪的小眼睛）{pet_name} 在【{chosen_spot['destination']}】的微風裡打了個舒服的盹呢...呼喵～這是給主人的【{chosen_spot['souvenir']}】喔...{catchphrase}",
+        "energetic": f"耶！太好玩了！{pet_name} 征服了【{chosen_spot['destination']}】！帶回了超棒的【{chosen_spot['souvenir']}】！下次一定要帶主人一起去狂奔！{catchphrase} ⚡",
+        "grumpy": f"（{pet_name} 嘟著小嘴把小背包塞到你手裡）『哼！我、我才不是特地去【{chosen_spot['destination']}】買紀念品討好你呢...這個【{chosen_spot['souvenir']}】只是剛好買多了！照片也給你看一眼啦！{catchphrase}』",
+        "tsundere": f"（{pet_name} 臉頰紅紅地轉過頭）『笨蛋主人！別以為我會一直想你...不過在【{chosen_spot['destination']}】看到這個【{chosen_spot['souvenir']}】就順便帶回來了...哼！{catchphrase}』",
+        "caring": f"主人工作辛苦了！{pet_name} 從【{chosen_spot['destination']}】平安帶回了療癒的【{chosen_spot['souvenir']}】喔！希望這張風景明信片能為主人減輕疲勞～{catchphrase} 🌸",
+        "curious": f"哇！【{chosen_spot['destination']}】有好多沒見過的新奇寶藏！{pet_name} 調查了好多秘密，還發現了這個【{chosen_spot['souvenir']}】！快聞聞看！{catchphrase} 🔍",
+        "mischievous": f"嘻嘻嘻～猜猜我從【{chosen_spot['destination']}】偷偷藏了什麼回來？沒錯就是【{chosen_spot['souvenir']}】！被我驚喜到了吧～{catchphrase} 😈",
+        "cheerful": f"主人主人！{pet_name} 從【{chosen_spot['destination']}】旅行回來了～！你看這是我拍的照片，美不美？我特地帶了【{chosen_spot['souvenir']}】送給你喔！{catchphrase} 💖",
     }
-    postcard_greeting = greeting_msgs.get(p_id, greeting_msgs["cheerful"])
+    postcard_greeting = greeting_msgs.get(p_id, greeting_msgs["clingy"])
 
     return {
         "status": "success",
